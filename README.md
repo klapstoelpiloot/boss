@@ -1,13 +1,13 @@
 # Binary Object Serialization and Storage
 
-This is a software library and file format to serialize C# objects to a binary file or datastream. It is designed for compact storage without the performance overhead of compression.
+This is a software library and file format to serialize C# objects to a binary file or data stream. It is designed for compact storage without the performance overhead of compression.
 
 ## File format
 In this notation we use the datatype indication `vlq` for a flexible number of bytes indicating a positive number (VLQ code) up to the size of an int (2,147,483,647). For more information see https://en.m.wikipedia.org/wiki/Variable-length_quantity
 
-The data starts with a `long` which is the position in bytes where the strings table begins (see below).
+The data stream starts with a `long` which indicates the position (in number of bytes) where the strings table begins (see below).
 
-Then same as **fixed type object**. First a `vlq` indicating the number of elements in the object. Then follow the elements.
+Then follows the root element, which is always a **fixed type object**. Note that the type and name are ommitted, because the type is known and no name is needed (this is root the object being serialized/deserialized). First a `vlq` indicating the number of elements in the object. Then follow the elements.
 
 For each element:
 
@@ -27,7 +27,7 @@ Custom element types can be implemented by way of extension. For example **Vecto
 Array of primitives or strings: First a `vlq` indicating the number of items. Then each primitive item is written as described above.
 
 **Fixed type object**: 
-Same as above. First a `vlq]` for number of elements. Then follow the elements.
+Same as above. First a `vlq` for number of elements. Then follow the elements.
 
 **Dynamic type object**:
 First a `vlq` that is the index in strings table for the class type name of the object. Then same as **fixed type object**.
