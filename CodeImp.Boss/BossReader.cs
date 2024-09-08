@@ -28,22 +28,6 @@ namespace CodeImp.Boss
 			BaseStream.Seek(sizeof(long), SeekOrigin.Begin);
 		}
 
-		public FixedObjectElement ReadRootElement()
-		{
-			FixedObjectElement e = new FixedObjectElement(string.Empty);
-			e.ReadFromStream(this);
-			return e;
-		}
-
-		public BossElement ReadNextElement()
-		{
-			byte type = ReadByte();
-			string name = ReadString();
-
-			// TODO: Make a BossElementFactory that poops out a specific element with this information
-
-		}
-
 		// We do strings differently
 		new public string? ReadString()
 		{

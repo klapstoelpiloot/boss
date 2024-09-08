@@ -7,15 +7,7 @@ In this notation we use the datatype indication `vlq` for a flexible number of b
 
 The data stream starts with a `long` which indicates the position (in number of bytes) where the strings table begins (see below).
 
-Then follows the root element, which is always a **fixed type object**. Note that the type and name are ommitted, because the type is known and no name is needed (this is root the object being serialized/deserialized). First a `vlq` indicating the number of elements in the object. Then follow the elements.
-
-For each element:
-
-`byte`
-Indicates the type of element that follows. When bit 8 is set, then an array of that element type follows.
-
-`vlq`
-Index in the string table for the Name of this element.
+Then follows the root element. The type of the root element is first indicated with a `byte`. After that follows the contents for that type. For example, if the type is an `int` then only one `int` follows. The root element is often a **fixed type object** and thus a `vlq` indicating the number of elements in the object follows. Then follow the elements of that object (see **fixed type object** below for more information).
 
 Primitive elements: **int, uint, long, ulong, float, double, bool, byte, sbyte, short, ushort**.
 These are just written as is. So for an integer an `int` is written. The size of this element and how it should be read is directly known from this element type.
@@ -24,22 +16,16 @@ These are just written as is. So for an integer an `int` is written. The size of
 
 Custom element types can be implemented by way of extension. For example **Vector2, Vector3, Vector4, Plane, Quaternion**... Same as primitive elements, we can directly write the known members. We do not expect these to change. So for **Vector3** that would be a `float` for X, a `float` for Y and a `float` for Z.
 
-Array of primitives or strings: First a `vlq` indicating the number of items. Then each primitive item is written as described above.
+**Fixed type object**: First a `vlq` for number of elements. Then follow the elements. For each element there is first a `vlq` which is the index in the string table for the Name of this element. Then a `byte` which indicates the type of element that follows. When bit 8 is set, then an array of that element type follows.
 
-**Fixed type object**: 
-Same as above. First a `vlq` for number of elements. Then follow the elements.
+**Dynamic type object**: First a `vlq` that is the index in strings table for the class type name of the object. Then same as **fixed type object**.
 
-**Dynamic type object**:
-First a `vlq` that is the index in strings table for the class type name of the object. Then same as **fixed type object**.
+**Arrays** (bit 0x80 in the Type is high): First a `vlq` indicating the number of items. Then each element is written as described by its Type.
 
-Arrays of fixed and dynamic objects work the same as for primitive types: First a `vlq` for the number of elements and then the fixed or dynamic objects follow.
+**Multidimensional arrays**: Set both the Type to **Array** and the array bit (8) high to indicate the array will contain arrays. Another `byte` follows to indicate if it will contain more dimensions or the data type of the elements in the array.
+
+**Fixed Dictionary**: Key-value pairs with string keys and one type for all values. A single `byte` indicates the type of all values. Then a `vlq` follows for the number of elements. Each element begins with a `vlq` for the index in the strings table for the key. The bytes after that depend on the element type.
+
+**Dynamic Dictionary**: Key-value pairs with string keys and each value can be of a different type. First a `vlq` for the number of elements. Each element is the same as for an object.
 
 After all elements follows the strings table. Every string starts with a `vlq` for the length of the string in number of bytes (not characters) and then follows the string in UTF8 format. There is no null terminator.
-
-Multidimensional arrays:
-Set both the Type to **Array** and the array bit (8) high to indicate the array will contain arrays. Another `byte` follows to indicate if it will contain more dimensions or the data type of the elements in the array.
-
-Dictionaries and lists of key-value pairs:
-**Fixed Dictionary** has string keys and one type for all values. A single `byte` indicates the type of all values. Then a `vlq` follows for the number of elements. Each element begins with a `vlq` for the index in the strings table for the key. The bytes after that depend on the element type.
-
-**Dynamic Dictionary** has string keys and each value can be of a different type. First a `vlq` for the number of elements. Each element is the same as for an object.

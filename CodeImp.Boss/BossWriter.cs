@@ -31,7 +31,7 @@
 
 			// Go back to the start to write the string table address
 			Flush();
-			BaseStream.Seek(strpos, SeekOrigin.Begin);
+			BaseStream.Seek(0, SeekOrigin.Begin);
 			Write(strpos);
 			Flush();
 			BaseStream.Seek(strpos, SeekOrigin.End);

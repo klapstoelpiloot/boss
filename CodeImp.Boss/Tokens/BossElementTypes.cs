@@ -8,7 +8,7 @@
 	/// </summary>
 	public enum BossElementTypes : byte
 	{
-		None = 0,
+		Null = 0,
 		Bool = 1,
 		Byte = 2,
 		SByte = 3,
