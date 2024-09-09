@@ -1,8 +1,6 @@
-﻿using CodeImp.Boss.TypeHandlers;
-
-namespace CodeImp.Boss.Tests
+﻿namespace CodeImp.Boss.Tests
 {
-	internal class CustomTypeHandlerTests : TestBase
+    internal class CustomTypeHandlerTests : TestBase
 	{
 		public struct Vector3
 		{

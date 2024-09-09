@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace CodeImp.Boss.TypeHandlers
 {
-	public class FixedObjectTypeHandler : BossTypeHandler
+    public class FixedObjectTypeHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.FixedObject;
 

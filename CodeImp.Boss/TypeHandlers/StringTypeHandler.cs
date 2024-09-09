@@ -1,6 +1,6 @@
 ﻿namespace CodeImp.Boss.TypeHandlers
 {
-	public class StringTypeHandler : BossTypeHandler
+    public class StringTypeHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.String;
 

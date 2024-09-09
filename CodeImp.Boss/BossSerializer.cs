@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace CodeImp.Boss
 {
-	public static class BossSerializer
+    public static class BossSerializer
 	{
 		// The type handlers by boss typecode
 		private static readonly BossTypeHandler[] typehandlers = new BossTypeHandler[256];

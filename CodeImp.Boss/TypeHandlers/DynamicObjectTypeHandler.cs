@@ -2,7 +2,7 @@ using System.Reflection;
 
 namespace CodeImp.Boss.TypeHandlers
 {
-	public class DynamicObjectTypeHandler : FixedObjectTypeHandler
+    public class DynamicObjectTypeHandler : FixedObjectTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.DynamicObject;
 
