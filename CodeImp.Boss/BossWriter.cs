@@ -60,7 +60,7 @@ namespace CodeImp.Boss
 		{
 			if(s == null)
 				return 0;
-			
+
 			if(!stringstable.TryGetValue(s, out int value))
 			{
 				// This string table does not include the null string, so we count + 1

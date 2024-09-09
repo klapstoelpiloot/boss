@@ -2,11 +2,9 @@
 {
 	public class NullTypeHandler : BossTypeHandler
 	{
-		public NullTypeHandler()
-		{
-			BossType = (byte)BossElementTypes.Null;
-			ClassTypes = [];
-		}
+		public override byte BossType => (byte)BossElementTypes.Null;
+
+		public override IEnumerable<Type> ClassTypes => [];
 
 		public override void WriteTo(BossWriter writer, object value)
 		{

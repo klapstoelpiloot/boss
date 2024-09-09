@@ -5,11 +5,9 @@ namespace CodeImp.Boss.TypeHandlers
 {
 	public class FixedObjectTypeHandler : BossTypeHandler
 	{
-		public FixedObjectTypeHandler()
-		{
-			BossType = (byte)BossElementTypes.FixedObject;
-			ClassTypes = [];
-		}
+		public override byte BossType => (byte)BossElementTypes.FixedObject;
+
+		public override IEnumerable<Type> ClassTypes => [];
 
 		public override void WriteTo(BossWriter writer, object value)
 		{

@@ -2,11 +2,9 @@
 {
 	public class StringTypeHandler : BossTypeHandler
 	{
-		public StringTypeHandler()
-		{
-			BossType = (byte)BossElementTypes.String;
-			ClassTypes = [typeof(string)];
-		}
+		public override byte BossType => (byte)BossElementTypes.String;
+
+		public override IEnumerable<Type> ClassTypes => [typeof(string)];
 
 		public override void WriteTo(BossWriter writer, object value)
 		{

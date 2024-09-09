@@ -2,9 +2,9 @@
 {
 	public abstract class BossTypeHandler
 	{
-		public byte BossType { get; protected set; }
+		public abstract byte BossType { get; }
 
-		public IEnumerable<Type> ClassTypes { get; protected set; } = [];
+		public abstract IEnumerable<Type> ClassTypes { get; }
 
 		// Constructor
 		protected BossTypeHandler()

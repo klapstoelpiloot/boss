@@ -2,11 +2,9 @@
 {
 	public class IntTypeHandler : BossTypeHandler
 	{
-		public IntTypeHandler()
-		{
-			BossType = (byte)BossElementTypes.Int;
-			ClassTypes = [typeof(int)];
-		}
+		public override byte BossType => (byte)BossElementTypes.Int;
+
+		public override IEnumerable<Type> ClassTypes => [typeof(int)];
 
 		public override void WriteTo(BossWriter writer, object value)
 		{

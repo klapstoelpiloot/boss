@@ -31,11 +31,9 @@ namespace CodeImp.Boss.Tests
 
 		public class Vector3TypeHandler : BossTypeHandler
 		{
-			public Vector3TypeHandler()
-			{
-				BossType = 64;
-				ClassTypes = [typeof(Vector3)];
-			}
+			public override byte BossType => 64;
+
+			public override IEnumerable<Type> ClassTypes => [typeof(Vector3)];
 
 			public override object? ReadFrom(BossReader reader, Type basetype)
 			{

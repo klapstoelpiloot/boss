@@ -1,7 +1,5 @@
 ﻿using CodeImp.Boss.TypeHandlers;
-using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace CodeImp.Boss
 {
@@ -62,6 +60,10 @@ namespace CodeImp.Boss
 			typenamelookup.Clear();
 		}
 
+		/// <summary>
+		/// Serializes the given object to the specified stream.
+		/// This does not close or dispose the stream.
+		/// </summary>
 		public static void Serialize<T>(T obj, Stream stream)
 		{
 			using BossWriter writer = new BossWriter(stream);
@@ -70,6 +72,10 @@ namespace CodeImp.Boss
 			writer.EndWriting();
 		}
 
+		/// <summary>
+		/// Deserializes an object from the specified stream.
+		/// This does not close or dispose the stream.
+		/// </summary>
 		public static T? Deserialize<T>(Stream stream)
 		{
 			using BossReader reader = new BossReader(stream);
@@ -77,6 +83,7 @@ namespace CodeImp.Boss
 			return (T?)Deserialize(reader, typeof(T));
 		}
 
+		// Find a matching type handler for the given object type.
 		private static BossTypeHandler SelectTypeHandler(Type? type, object? obj)
 		{
 			// TODO: Add support for arrays
@@ -115,15 +122,14 @@ namespace CodeImp.Boss
 			}
 		}
 
-		/// <summary>
-		/// Serializes the given object.
-		/// </summary>
+		// Serializes the given object
 		internal static void Serialize(object? obj, Type? type, BossWriter writer)
 		{
 			BossTypeHandler h = SelectTypeHandler(type, obj);
 			SerializeWithHandler(obj, h, writer);
 		}
 
+		// Deserializes an object
 		internal static object? Deserialize(BossReader reader, Type basetype)
 		{
 			byte typecode = reader.ReadByte();
@@ -131,9 +137,7 @@ namespace CodeImp.Boss
 			return h.ReadFrom(reader, basetype);
 		}
 
-		/// <summary>
-		/// Serializes the given object using the specified type handler.
-		/// </summary>
+		// Serializes the given object using the specified type handler.
 		internal static void SerializeWithHandler(object? obj, BossTypeHandler handler, BossWriter writer)
 		{
 			writer.Write(handler.BossType);
@@ -143,9 +147,7 @@ namespace CodeImp.Boss
 			}
 		}
 
-		/// <summary>
-		/// This tries to find a type by its name and basetype.
-		/// </summary>
+		// This tries to find a type by its name and basetype.
 		internal static Type? FindType(string typename, Type basetype)
 		{
 			// Can we get a quick result from cache?
@@ -175,9 +177,7 @@ namespace CodeImp.Boss
 			return null;
 		}
 
-		/// <summary>
-		/// Helper method to get all serializable members from the specified type.
-		/// </summary>
+		// Helper method to get all serializable members from the specified type.
 		internal static List<MemberInfo> GetSerializableMembers(Type type)
 		{
 			List<MemberInfo> members =
@@ -191,9 +191,7 @@ namespace CodeImp.Boss
 				.ToList();
 		}
 
-		/// <summary>
-		/// Helper method to get a specific serializable member from the specified type.
-		/// </summary>
+		// Helper method to get a specific serializable member from the specified type.
 		internal static MemberInfo? FindSerializableMember(Type type, string name)
 		{
 			List<MemberInfo> members = GetSerializableMembers(type);
