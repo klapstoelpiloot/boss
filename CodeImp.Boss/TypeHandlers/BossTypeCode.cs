@@ -3,13 +3,13 @@
 namespace CodeImp.Boss.TypeHandlers
 {
 	/// <summary>
-	/// Element Type values.
+	/// Type code values used in the Boss data format.
 	/// Values are split up in the following ranges:
 	/// 0  .. 63  - Built-in types
 	/// 64 .. 127 - Extension types
 	/// </summary>
 	[SuppressMessage("Design", "CA1069:Enums values should not be duplicated", Justification = "Some of these enums indicate ranges")]
-	public enum BossElementTypes : byte
+	public enum BossTypeCode : byte
 	{
 		Null = 0,
 		Bool = 1,

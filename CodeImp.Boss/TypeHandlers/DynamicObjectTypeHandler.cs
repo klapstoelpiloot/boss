@@ -4,7 +4,7 @@ namespace CodeImp.Boss.TypeHandlers
 {
 	public class DynamicObjectTypeHandler : FixedObjectTypeHandler
 	{
-		public override byte BossType => (byte)BossElementTypes.DynamicObject;
+		public override byte BossType => (byte)BossTypeCode.DynamicObject;
 
 		public override IEnumerable<Type> ClassTypes => [];
 

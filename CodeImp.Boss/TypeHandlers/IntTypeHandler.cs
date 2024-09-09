@@ -2,7 +2,7 @@
 {
 	public class IntTypeHandler : BossTypeHandler
 	{
-		public override byte BossType => (byte)BossElementTypes.Int;
+		public override byte BossType => (byte)BossTypeCode.Int;
 
 		public override IEnumerable<Type> ClassTypes => [typeof(int)];
 

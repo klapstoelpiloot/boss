@@ -2,7 +2,7 @@
 {
 	public class NullTypeHandler : BossTypeHandler
 	{
-		public override byte BossType => (byte)BossElementTypes.Null;
+		public override byte BossType => (byte)BossTypeCode.Null;
 
 		public override IEnumerable<Type> ClassTypes => [];
 

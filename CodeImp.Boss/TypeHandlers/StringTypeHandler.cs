@@ -2,7 +2,7 @@
 {
 	public class StringTypeHandler : BossTypeHandler
 	{
-		public override byte BossType => (byte)BossElementTypes.String;
+		public override byte BossType => (byte)BossTypeCode.String;
 
 		public override IEnumerable<Type> ClassTypes => [typeof(string)];
 

@@ -27,7 +27,7 @@ namespace CodeImp.Boss
 		/// </summary>
 		private static void RegisterTypeHandlerInternal(BossTypeHandler handler)
 		{
-			if(handler.BossType >= (int)BossElementTypes.ExtensionRangeStart)
+			if(handler.BossType >= (int)BossTypeCode.ExtensionRangeStart)
 				throw new InvalidOperationException("Built-in type handlers should be in the range 0 .. 63");
 
 			typehandlers[handler.BossType] = handler;
@@ -38,7 +38,7 @@ namespace CodeImp.Boss
 		/// </summary>
 		public static void RegisterTypeHandler(BossTypeHandler handler)
 		{
-			if(handler.BossType < (int)BossElementTypes.ExtensionRangeStart)
+			if(handler.BossType < (int)BossTypeCode.ExtensionRangeStart)
 				throw new InvalidOperationException("Extension type handlers should be in the range 64 .. 127");
 
 			typehandlers[handler.BossType] = handler;
@@ -90,7 +90,7 @@ namespace CodeImp.Boss
 
 			if(obj is null)
 			{
-				return typehandlers[(byte)BossElementTypes.Null];
+				return typehandlers[(byte)BossTypeCode.Null];
 			}
 			else
 			{
@@ -106,12 +106,12 @@ namespace CodeImp.Boss
 						if(type.IsInterface || type.IsAbstract || (type != obj.GetType()))
 						{
 							// We need a dynamic object
-							return typehandlers[(byte)BossElementTypes.DynamicObject];
+							return typehandlers[(byte)BossTypeCode.DynamicObject];
 						}
 						else
 						{
 							// Class or struct object
-							return typehandlers[(byte)BossElementTypes.FixedObject];
+							return typehandlers[(byte)BossTypeCode.FixedObject];
 						}
 					}
 					else
