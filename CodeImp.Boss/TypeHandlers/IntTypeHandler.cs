@@ -1,4 +1,4 @@
-﻿namespace CodeImp.Boss.Tokens
+﻿namespace CodeImp.Boss.TypeHandlers
 {
 	public class IntTypeHandler : BossTypeHandler
 	{
@@ -13,7 +13,7 @@
 			writer.Write((int)value);
 		}
 
-		public override object ReadFrom(BossReader reader)
+		public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
 		{
 			return reader.ReadInt32();
 		}

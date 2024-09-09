@@ -1,11 +1,13 @@
-﻿namespace CodeImp.Boss
+﻿using System.Text;
+
+namespace CodeImp.Boss
 {
 	public class BossWriter : BinaryWriter
 	{
 		private readonly Dictionary<string, int> stringstable = new Dictionary<string, int>();
 
 		// Constructor
-		public BossWriter(Stream stream) : base(stream)
+		public BossWriter(Stream stream) : base(stream, Encoding.UTF8, true)
 		{
 		}
 

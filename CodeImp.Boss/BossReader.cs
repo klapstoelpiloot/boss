@@ -1,4 +1,5 @@
-﻿using CodeImp.Boss.Tokens;
+﻿using CodeImp.Boss.TypeHandlers;
+using System.Text;
 
 namespace CodeImp.Boss
 {
@@ -6,7 +7,7 @@ namespace CodeImp.Boss
 	{
 		private readonly List<string?> stringstable = new List<string?>();
 
-		public BossReader(Stream input) : base(input)
+		public BossReader(Stream input) : base(input, Encoding.UTF8, true)
 		{
 		}
 

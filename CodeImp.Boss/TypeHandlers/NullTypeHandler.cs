@@ -1,4 +1,4 @@
-﻿namespace CodeImp.Boss.Tokens
+﻿namespace CodeImp.Boss.TypeHandlers
 {
 	public class NullTypeHandler : BossTypeHandler
 	{
@@ -12,9 +12,9 @@
 		{
 		}
 
-		public override object ReadFrom(BossReader reader)
+		public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
 		{
-			return new object();
+			return null;
 		}
 	}
 }

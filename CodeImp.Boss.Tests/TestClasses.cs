@@ -2,13 +2,24 @@
 {
 	public class BaseBoy
 	{
-		public int Age { get; set; }
-		public string Nickname { get; set; }
+		public const int CONST_FIELD = 4;
 
-		public BaseBoy()
-		{
-			Age = 6;
-			Nickname = "Bubba";
-		}
+		public readonly int readonlyfield = 99;
+		public int intfield = 2;
+
+		public int IntProperty { get; set; } = 6;
+		public string StringProperty { get; set; } = "BaseBoy";
+		public MemberMama? NullProperty { get; set; }
+		public MemberMama ObjectProperty { get; set; } = new MemberMama();
+	}
+
+	public class MemberMama
+	{
+		public string StringProperty { get; set; } = "Mommy";
+	}
+
+	public class DerivedDonny : BaseBoy
+	{
+		public int AnotherIntProperty { get; set; } = 1183572;
 	}
 }

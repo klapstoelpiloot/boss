@@ -1,4 +1,4 @@
-﻿namespace CodeImp.Boss.Tokens
+﻿namespace CodeImp.Boss.TypeHandlers
 {
 	/// <summary>
 	/// Element Type values.
