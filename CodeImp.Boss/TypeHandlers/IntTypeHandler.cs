@@ -8,12 +8,12 @@
 			ClassTypes = [typeof(int)];
 		}
 
-		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
+		public override void WriteTo(BossWriter writer, object value)
 		{
 			writer.Write((int)value);
 		}
 
-		public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
+		public override object? ReadFrom(BossReader reader, Type basetype)
 		{
 			return reader.ReadInt32();
 		}

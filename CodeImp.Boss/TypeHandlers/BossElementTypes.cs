@@ -1,11 +1,14 @@
-﻿namespace CodeImp.Boss.TypeHandlers
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace CodeImp.Boss.TypeHandlers
 {
 	/// <summary>
 	/// Element Type values.
 	/// Values are split up in the following ranges:
-	/// 0  .. 64  - Built-in types
+	/// 0  .. 63  - Built-in types
 	/// 64 .. 127 - Extension types
 	/// </summary>
+	[SuppressMessage("Design", "CA1069:Enums values should not be duplicated", Justification = "Some of these enums indicate ranges")]
 	public enum BossElementTypes : byte
 	{
 		Null = 0,
@@ -29,6 +32,7 @@
 
 		// ...
 
-		Array = 0x80
+		ExtensionRangeStart = 64,
+		ArrayBit = 0x80
 	}
 }

@@ -1,41 +1,68 @@
 ﻿using CodeImp.Boss.TypeHandlers;
+using System.Diagnostics;
 using System.Reflection;
-using System.Security.AccessControl;
+using System.Runtime.CompilerServices;
 
 namespace CodeImp.Boss
 {
-	public class BossSerializer
+	public static class BossSerializer
 	{
-		private BossTypeHandler[] typehandlers = new BossTypeHandler[256];
-		private Dictionary<string, Type> typenamelookup = new Dictionary<string, Type>();
+		// The type handlers by boss typecode
+		private static readonly BossTypeHandler[] typehandlers = new BossTypeHandler[256];
+
+		// Lookup cache for Types by their classname only
+		private static readonly Dictionary<string, Type> typenamelookup = [];
 
 		// Constructor
-		public BossSerializer()
+		static BossSerializer()
 		{
 			// Internal type handlers
-			RegisterTypeHandler(BossElementTypes.Null, new NullTypeHandler());
-			RegisterTypeHandler(BossElementTypes.Int, new IntTypeHandler());
-			RegisterTypeHandler(BossElementTypes.String, new StringTypeHandler());
-			RegisterTypeHandler(BossElementTypes.FixedObject, new FixedObjectTypeHandler());
-			RegisterTypeHandler(BossElementTypes.DynamicObject, new DynamicObjectTypeHandler());
+			RegisterTypeHandlerInternal(new NullTypeHandler());
+			RegisterTypeHandlerInternal(new IntTypeHandler());
+			RegisterTypeHandlerInternal(new StringTypeHandler());
+			RegisterTypeHandlerInternal(new FixedObjectTypeHandler());
+			RegisterTypeHandlerInternal(new DynamicObjectTypeHandler());
 		}
 
-		private void RegisterTypeHandler(BossElementTypes typecode, BossTypeHandler handler)
+		/// <summary>
+		/// Registers a type handler for the specified Boss typecode.
+		/// </summary>
+		private static void RegisterTypeHandlerInternal(BossTypeHandler handler)
 		{
-			RegisterTypeHandler((byte)typecode, handler);
+			if(handler.BossType >= (int)BossElementTypes.ExtensionRangeStart)
+				throw new InvalidOperationException("Built-in type handlers should be in the range 0 .. 63");
+
+			typehandlers[handler.BossType] = handler;
 		}
 
-		public void RegisterTypeHandler(byte typecode, BossTypeHandler handler)
+		/// <summary>
+		/// Registers a type handler for the specified Boss typecode.
+		/// </summary>
+		public static void RegisterTypeHandler(BossTypeHandler handler)
 		{
-			typehandlers[typecode] = handler;
+			if(handler.BossType < (int)BossElementTypes.ExtensionRangeStart)
+				throw new InvalidOperationException("Extension type handlers should be in the range 64 .. 127");
+
+			typehandlers[handler.BossType] = handler;
 		}
 
-		public void RegisterTypeLookup(Type t)
+		/// <summary>
+		/// Adds a Type to the lookup cache to improve the performance of Type instantiation during deserialization.
+		/// </summary>
+		public static void AddTypeLookupCache(Type t)
 		{
 			typenamelookup[t.Name] = t;
 		}
 
-		public void Serialize<T>(T obj, Stream stream)
+		/// <summary>
+		/// Clears the Type lookup cache.
+		/// </summary>
+		public static void ClearTypeLookupCache()
+		{
+			typenamelookup.Clear();
+		}
+
+		public static void Serialize<T>(T obj, Stream stream)
 		{
 			using BossWriter writer = new BossWriter(stream);
 			writer.BeginWriting();
@@ -43,17 +70,17 @@ namespace CodeImp.Boss
 			writer.EndWriting();
 		}
 
-		public T? Deserialize<T>(Stream stream)
+		public static T? Deserialize<T>(Stream stream)
 		{
 			using BossReader reader = new BossReader(stream);
 			reader.BeginReading();
 			return (T?)Deserialize(reader, typeof(T));
 		}
 
-		private BossTypeHandler SelectTypeHandler(Type? type, object? obj)
+		private static BossTypeHandler SelectTypeHandler(Type? type, object? obj)
 		{
 			// TODO: Add support for arrays
-			
+
 			if(obj is null)
 			{
 				return typehandlers[(byte)BossElementTypes.Null];
@@ -91,35 +118,35 @@ namespace CodeImp.Boss
 		/// <summary>
 		/// Serializes the given object.
 		/// </summary>
-		internal void Serialize(object? obj, Type? type, BossWriter writer)
+		internal static void Serialize(object? obj, Type? type, BossWriter writer)
 		{
 			BossTypeHandler h = SelectTypeHandler(type, obj);
 			SerializeWithHandler(obj, h, writer);
 		}
 
-		internal object? Deserialize(BossReader reader, Type basetype)
+		internal static object? Deserialize(BossReader reader, Type basetype)
 		{
 			byte typecode = reader.ReadByte();
 			BossTypeHandler h = typehandlers[typecode] ?? throw new InvalidDataException($"No type handler registered to deserialize type code '{typecode}'");
-			return h.ReadFrom(this, reader, basetype);
+			return h.ReadFrom(reader, basetype);
 		}
 
 		/// <summary>
 		/// Serializes the given object using the specified type handler.
 		/// </summary>
-		internal void SerializeWithHandler(object? obj, BossTypeHandler handler, BossWriter writer)
+		internal static void SerializeWithHandler(object? obj, BossTypeHandler handler, BossWriter writer)
 		{
 			writer.Write(handler.BossType);
 			if(obj != null)
 			{
-				handler.WriteTo(this, writer, obj);
+				handler.WriteTo(writer, obj);
 			}
 		}
 
 		/// <summary>
 		/// This tries to find a type by its name and basetype.
 		/// </summary>
-		internal Type? FindType(string typename, Type basetype)
+		internal static Type? FindType(string typename, Type basetype)
 		{
 			// Can we get a quick result from cache?
 			if(typenamelookup.TryGetValue(typename, out Type? type) && type.IsAssignableTo(basetype))
@@ -129,7 +156,7 @@ namespace CodeImp.Boss
 			type = basetype.Assembly.GetTypes().FirstOrDefault(t => (t.Name == typename) && t.IsAssignableTo(basetype));
 			if(type != null)
 			{
-				RegisterTypeLookup(type);
+				AddTypeLookupCache(type);
 				return type;
 			}
 
@@ -139,7 +166,7 @@ namespace CodeImp.Boss
 				type = a.GetTypes().FirstOrDefault(t => (t.Name == typename) && t.IsAssignableTo(basetype));
 				if(type != null)
 				{
-					RegisterTypeLookup(type);
+					AddTypeLookupCache(type);
 					return type;
 				}
 			}
@@ -147,7 +174,7 @@ namespace CodeImp.Boss
 			// Nothing found
 			return null;
 		}
-		
+
 		/// <summary>
 		/// Helper method to get all serializable members from the specified type.
 		/// </summary>
@@ -163,7 +190,7 @@ namespace CodeImp.Boss
 				.Where(m => (m.GetCustomAttribute<BossIgnoreAttribute>(true) == null))
 				.ToList();
 		}
-		
+
 		/// <summary>
 		/// Helper method to get a specific serializable member from the specified type.
 		/// </summary>

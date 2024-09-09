@@ -1,6 +1,4 @@
-﻿using static CodeImp.Boss.Tests.SimpleTypeTests;
-
-namespace CodeImp.Boss.Tests
+﻿namespace CodeImp.Boss.Tests
 {
 	internal class DynamicObjectsTests : TestBase
 	{
@@ -21,14 +19,13 @@ namespace CodeImp.Boss.Tests
 		public void ObjectWithInterfacePropertyNull()
 		{
 			ObjWithInterfaceProperty obj = new ObjWithInterfaceProperty();
-			BossSerializer serializer = new BossSerializer();
 			MemoryStream stream = new MemoryStream();
-			serializer.Serialize(obj, stream);
+			BossSerializer.Serialize(obj, stream);
 
 			AssertStreamIsEqualTo(stream, "0C-00-00-00-00-00-00-00-0E-01-01-00-01-04-44-79-6E-61");
 
 			stream.Seek(0, SeekOrigin.Begin);
-			ObjWithInterfaceProperty? result = serializer.Deserialize<ObjWithInterfaceProperty>(stream);
+			ObjWithInterfaceProperty? result = BossSerializer.Deserialize<ObjWithInterfaceProperty>(stream);
 			Assert.That(result, Is.Not.Null);
 			Assert.That(result, Is.InstanceOf<ObjWithInterfaceProperty>());
 			Assert.That(result.Dyna, Is.Null);
@@ -39,14 +36,13 @@ namespace CodeImp.Boss.Tests
 		{
 			ObjWithInterfaceProperty obj = new ObjWithInterfaceProperty();
 			obj.Dyna = new DynamicClass1();
-			BossSerializer serializer = new BossSerializer();
 			MemoryStream stream = new MemoryStream();
-			serializer.Serialize(obj, stream);
+			BossSerializer.Serialize(obj, stream);
 
 			AssertStreamIsEqualTo(stream, "0E-00-00-00-00-00-00-00-0E-01-01-0F-02-00-02-04-44-79-6E-61-0D-44-79-6E-61-6D-69-63-43-6C-61-73-73-31");
 
 			stream.Seek(0, SeekOrigin.Begin);
-			ObjWithInterfaceProperty? result = serializer.Deserialize<ObjWithInterfaceProperty>(stream);
+			ObjWithInterfaceProperty? result = BossSerializer.Deserialize<ObjWithInterfaceProperty>(stream);
 			Assert.That(result, Is.Not.Null);
 			Assert.That(result, Is.InstanceOf<ObjWithInterfaceProperty>());
 			Assert.That(result.Dyna, Is.InstanceOf<DynamicClass1>());
@@ -69,14 +65,13 @@ namespace CodeImp.Boss.Tests
 		public void ObjectWithDerivedClassPropertyNull()
 		{
 			ObjWithDerivedClassProperty obj = new ObjWithDerivedClassProperty();
-			BossSerializer serializer = new BossSerializer();
 			MemoryStream stream = new MemoryStream();
-			serializer.Serialize(obj, stream);
+			BossSerializer.Serialize(obj, stream);
 
 			AssertStreamIsEqualTo(stream, "0C-00-00-00-00-00-00-00-0E-01-01-00-01-04-44-79-6E-61");
 
 			stream.Seek(0, SeekOrigin.Begin);
-			ObjWithDerivedClassProperty? result = serializer.Deserialize<ObjWithDerivedClassProperty>(stream);
+			ObjWithDerivedClassProperty? result = BossSerializer.Deserialize<ObjWithDerivedClassProperty>(stream);
 			Assert.That(result, Is.Not.Null);
 			Assert.That(result, Is.InstanceOf<ObjWithDerivedClassProperty>());
 			Assert.That(result.Dyna, Is.Null);
@@ -87,14 +82,13 @@ namespace CodeImp.Boss.Tests
 		{
 			ObjWithDerivedClassProperty obj = new ObjWithDerivedClassProperty();
 			obj.Dyna = new DerivedDynamicClass2();
-			BossSerializer serializer = new BossSerializer();
 			MemoryStream stream = new MemoryStream();
-			serializer.Serialize(obj, stream);
+			BossSerializer.Serialize(obj, stream);
 
 			AssertStreamIsEqualTo(stream, "0E-00-00-00-00-00-00-00-0E-01-01-0F-02-00-02-04-44-79-6E-61-14-44-65-72-69-76-65-64-44-79-6E-61-6D-69-63-43-6C-61-73-73-32");
 
 			stream.Seek(0, SeekOrigin.Begin);
-			ObjWithDerivedClassProperty? result = serializer.Deserialize<ObjWithDerivedClassProperty>(stream);
+			ObjWithDerivedClassProperty? result = BossSerializer.Deserialize<ObjWithDerivedClassProperty>(stream);
 			Assert.That(result, Is.Not.Null);
 			Assert.That(result, Is.InstanceOf<ObjWithDerivedClassProperty>());
 			Assert.That(result.Dyna, Is.InstanceOf<DerivedDynamicClass2>());
