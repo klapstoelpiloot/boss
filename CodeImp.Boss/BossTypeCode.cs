@@ -6,9 +6,8 @@ namespace CodeImp.Boss
     /// Type code values used in the Boss data format.
     /// Values are split up in the following ranges:
     /// 0  .. 63  - Built-in types
-    /// 64 .. 127 - Extension types
+    /// 64 .. 255 - Extension types
     /// </summary>
-    [SuppressMessage("Design", "CA1069:Enums values should not be duplicated", Justification = "Some of these enums indicate ranges")]
     public enum BossTypeCode : byte
     {
         Null = 0,
@@ -24,15 +23,13 @@ namespace CodeImp.Boss
         Float = 10,
         Double = 11,
         String = 12,
-        MultiArray = 13,
-        FixedObject = 14,
-        DynamicObject = 15,
-        FixedDictionary = 16,
-        DynamicDictionary = 17,
+        FixedArray = 13,
+		DynamicArray = 14,
+        FixedObject = 15,
+        DynamicObject = 16,
+        FixedDictionary = 17,
+        DynamicDictionary = 18,
 
-        // ...
-
-        ExtensionRangeStart = 64,
-        ArrayBit = 0x80
+        LastBuiltIn = 63
     }
 }

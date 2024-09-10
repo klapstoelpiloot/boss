@@ -1,9 +1,8 @@
-﻿
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace CodeImp.Boss.TypeHandlers
 {
-    public class FixedObjectTypeHandler : BossTypeHandler
+	public class FixedObjectHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.FixedObject;
 

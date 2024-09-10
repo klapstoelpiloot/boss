@@ -66,7 +66,7 @@
 			MemoryStream stream = new MemoryStream();
 			BossSerializer.Serialize(obj, stream);
 
-			AssertStreamIsEqualTo(stream, "18-00-00-00-00-00-00-00-0E-01-01-40-00-00-80-3F-00-00-00-40-00-00-40-40-01-03-50-6F-73");
+			AssertStreamIsEqualTo(stream, "18-00-00-00-00-00-00-00-0F-01-01-40-00-00-80-3F-00-00-00-40-00-00-40-40-01-03-50-6F-73");
 
 			stream.Seek(0, SeekOrigin.Begin);
 			ObjWithVector3? result = BossSerializer.Deserialize<ObjWithVector3>(stream);

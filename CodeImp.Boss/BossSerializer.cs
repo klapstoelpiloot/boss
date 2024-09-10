@@ -1,9 +1,10 @@
 ﻿using CodeImp.Boss.TypeHandlers;
+using System.Collections;
 using System.Reflection;
 
 namespace CodeImp.Boss
 {
-    public static class BossSerializer
+	public static class BossSerializer
 	{
 		// The type handlers by boss typecode
 		private static readonly BossTypeHandler[] typehandlers = new BossTypeHandler[256];
@@ -14,12 +15,15 @@ namespace CodeImp.Boss
 		// Constructor
 		static BossSerializer()
 		{
-			// Internal type handlers
-			RegisterTypeHandlerInternal(new NullTypeHandler());
-			RegisterTypeHandlerInternal(new IntTypeHandler());
-			RegisterTypeHandlerInternal(new StringTypeHandler());
-			RegisterTypeHandlerInternal(new FixedObjectTypeHandler());
-			RegisterTypeHandlerInternal(new DynamicObjectTypeHandler());
+			// Register all built-in type handlers
+			Type basetype = typeof(BossTypeHandler);
+			List<Type> handlertypes = Assembly.GetExecutingAssembly().GetTypes()
+			                          .Where(t => !t.IsAbstract && t.IsAssignableTo(basetype)).ToList();
+			foreach(Type t in handlertypes)
+			{
+				if(Activator.CreateInstance(t) is BossTypeHandler handler)
+					RegisterTypeHandlerInternal(handler);
+			}
 		}
 
 		/// <summary>
@@ -27,7 +31,7 @@ namespace CodeImp.Boss
 		/// </summary>
 		private static void RegisterTypeHandlerInternal(BossTypeHandler handler)
 		{
-			if(handler.BossType >= (int)BossTypeCode.ExtensionRangeStart)
+			if(handler.BossType > (int)BossTypeCode.LastBuiltIn)
 				throw new InvalidOperationException("Built-in type handlers should be in the range 0 .. 63");
 
 			typehandlers[handler.BossType] = handler;
@@ -38,8 +42,8 @@ namespace CodeImp.Boss
 		/// </summary>
 		public static void RegisterTypeHandler(BossTypeHandler handler)
 		{
-			if(handler.BossType < (int)BossTypeCode.ExtensionRangeStart)
-				throw new InvalidOperationException("Extension type handlers should be in the range 64 .. 127");
+			if(handler.BossType <= (int)BossTypeCode.LastBuiltIn)
+				throw new InvalidOperationException("Extension type handlers should be in the range 64 .. 255");
 
 			typehandlers[handler.BossType] = handler;
 		}
@@ -83,58 +87,87 @@ namespace CodeImp.Boss
 			return (T?)Deserialize(reader, typeof(T));
 		}
 
-		// Find a matching type handler for the given object type.
-		private static BossTypeHandler SelectTypeHandler(Type? type, object? obj)
+		// Returns the handler for the specified Boss type code
+		internal static BossTypeHandler GetTypeHandler(BossTypeCode typecode)
 		{
-			// TODO: Add support for arrays
+			return typehandlers[(byte)typecode];
+		}
 
-			if(obj is null)
+		/// <summary>
+		/// Returns the handler for the specified Boss type code
+		/// </summary>
+		public static BossTypeHandler GetTypeHandler(byte typecode)
+		{
+			return typehandlers[typecode];
+		}
+
+		/// <summary>
+		/// Find a matching type handler for the given object type.
+		/// The argument membertype is the type as which the property/field is declared.
+		/// The argument objecttype is the actual object's type, which may be different.
+		/// Set it to null when the object is null.
+		/// </summary>
+		public static BossTypeHandler SelectTypeHandler(Type membertype, Type? objecttype)
+		{
+			// Null is just that. Null.
+			if(objecttype is null)
+				return GetTypeHandler(BossTypeCode.Null);
+
+			// See if we have a type handler for this kind of thing...
+			BossTypeHandler? handler = typehandlers.FirstOrDefault(h => (h != null) && h.ClassTypes.Contains(membertype));
+			if(handler != null)
 			{
-				return typehandlers[(byte)BossTypeCode.Null];
+				return handler;
 			}
-			else
+			// Primitive type? int, float, bool, etc...
+			else if(membertype.IsPrimitive)
 			{
-				BossTypeHandler? h = typehandlers.FirstOrDefault(h => (h != null) && h.ClassTypes.Contains(type));
-				if(h != null)
+				// For primitives we really do need a type handler ¯\_(ツ)_/¯
+				throw new InvalidDataException($"No type handler registered to serialize type '{membertype}'");
+			}
+			// If this is a collection type, then pick one of the array handlers...
+			else if(membertype.IsArray || membertype.IsEnumerable() || membertype.IsGenericEnumerable())
+			{
+				Type elementtype = GetCollectionElementType(membertype);
+				if(elementtype.IsValueType || elementtype.IsPrimitive)
 				{
-					return h;
+					// A collection of structs or primitives never contains null or any other type,
+					// so we use a simplified array storage method...
+					return GetTypeHandler(BossTypeCode.FixedArray);
 				}
 				else
 				{
-					if((type != null) && !type.IsPrimitive)
-					{
-						if(type.IsInterface || type.IsAbstract || (type != obj.GetType()))
-						{
-							// We need a dynamic object
-							return typehandlers[(byte)BossTypeCode.DynamicObject];
-						}
-						else
-						{
-							// Class or struct object
-							return typehandlers[(byte)BossTypeCode.FixedObject];
-						}
-					}
-					else
-					{
-						throw new InvalidDataException($"No type handler registered to serialize type '{type}'");
-					}
+					// Reference type elements can be null or can be derived classes...
+					return GetTypeHandler(BossTypeCode.DynamicArray);
 				}
+			}
+			// Pick a generic type handler for struct or class objects
+			else if(membertype.IsInterface || membertype.IsAbstract || (membertype != objecttype))
+			{
+				// When the object type can differ from the member base type, we need to use
+				// the DynamicObject handler, which also serializes the object class name...
+				return GetTypeHandler(BossTypeCode.DynamicObject);
+			}
+			else
+			{
+				// Fixed object type. Not so complicated.
+				return GetTypeHandler(BossTypeCode.FixedObject);
 			}
 		}
 
 		// Serializes the given object
-		internal static void Serialize(object? obj, Type? type, BossWriter writer)
+		internal static void Serialize(object? obj, Type type, BossWriter writer)
 		{
-			BossTypeHandler h = SelectTypeHandler(type, obj);
-			SerializeWithHandler(obj, h, writer);
+			BossTypeHandler? handler = SelectTypeHandler(type, obj?.GetType() ?? null);
+			SerializeWithHandler(obj, handler, writer);
 		}
 
 		// Deserializes an object
 		internal static object? Deserialize(BossReader reader, Type basetype)
 		{
 			byte typecode = reader.ReadByte();
-			BossTypeHandler h = typehandlers[typecode] ?? throw new InvalidDataException($"No type handler registered to deserialize type code '{typecode}'");
-			return h.ReadFrom(reader, basetype);
+			BossTypeHandler handler = typehandlers[typecode];
+			return handler.ReadFrom(reader, basetype);
 		}
 
 		// Serializes the given object using the specified type handler.
@@ -175,6 +208,52 @@ namespace CodeImp.Boss
 
 			// Nothing found
 			return null;
+		}
+
+		public static Type GetCollectionElementType(Type type)
+		{
+			if(type.IsArray)
+			{
+				return type.GetElementType();
+			}
+			else if(type.IsGenericEnumerable())
+			{
+				Type[] generictypes = type.GetGenericArguments();
+				return generictypes[0];
+			}
+			else if(type.IsEnumerable())
+			{
+				return typeof(object);
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
+		}
+
+		public static int GetCollectionElementCount(Type type, object collection)
+		{
+			if(type.IsArray)
+			{
+				Array a = collection as Array ?? throw new InvalidOperationException();
+				if(a.Rank > 1)
+					throw new NotSupportedException("Multidimensional arrays are not supported.");
+				return a.Length;
+			}
+			else if(type.IsEnumerable())
+			{
+				IEnumerable e = collection as IEnumerable ?? throw new InvalidOperationException();
+				return e.Count();
+			}
+			else if(type.IsGenericEnumerable())
+			{
+				PropertyInfo countproperty = type.GetProperty("Count") ?? throw new InvalidOperationException();
+				return (int)countproperty.GetValue(collection);
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
 		}
 
 		// Helper method to get all serializable members from the specified type.

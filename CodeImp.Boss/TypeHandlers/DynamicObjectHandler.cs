@@ -1,8 +1,6 @@
-using System.Reflection;
-
 namespace CodeImp.Boss.TypeHandlers
 {
-    public class DynamicObjectTypeHandler : FixedObjectTypeHandler
+	public class DynamicObjectHandler : FixedObjectHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.DynamicObject;
 

@@ -1,6 +1,6 @@
 ﻿namespace CodeImp.Boss.TypeHandlers
 {
-    public class NullTypeHandler : BossTypeHandler
+    public class NullHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.Null;
 
