@@ -3,8 +3,8 @@
     public class StringHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.String;
-
-		public override IEnumerable<Type> ClassTypes => [typeof(string)];
+		
+		public override Type ClassType => typeof(string);
 
 		public override void WriteTo(BossWriter writer, object value)
 		{

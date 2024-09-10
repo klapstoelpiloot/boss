@@ -6,7 +6,7 @@ namespace CodeImp.Boss.TypeHandlers
 	{
 		public override byte BossType => (byte)BossTypeCode.FixedObject;
 
-		public override IEnumerable<Type> ClassTypes => [];
+		public override Type? ClassType => null;
 
 		public override void WriteTo(BossWriter writer, object value)
 		{

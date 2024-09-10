@@ -8,9 +8,13 @@ namespace CodeImp.Boss
 	{
 		// The type handlers by boss typecode
 		private static readonly BossTypeHandler[] typehandlers = new BossTypeHandler[256];
+		private static readonly Dictionary<Type, BossTypeHandler> handlersbyclasstype = new Dictionary<Type, BossTypeHandler>();
 
 		// Lookup cache for Types by their classname only
 		private static readonly Dictionary<string, Type> typenamelookup = [];
+
+		// Lookup cache for class/struct members
+		private static readonly Dictionary<Type, List<MemberInfo>> serializablememberscache = [];
 
 		// Constructor
 		static BossSerializer()
@@ -35,6 +39,10 @@ namespace CodeImp.Boss
 				throw new InvalidOperationException("Built-in type handlers should be in the range 0 .. 63");
 
 			typehandlers[handler.BossType] = handler;
+			if(handler.ClassType != null)
+			{
+				handlersbyclasstype[handler.ClassType] = handler;
+			}
 		}
 
 		/// <summary>
@@ -46,6 +54,10 @@ namespace CodeImp.Boss
 				throw new InvalidOperationException("Extension type handlers should be in the range 64 .. 255");
 
 			typehandlers[handler.BossType] = handler;
+			if(handler.ClassType != null)
+			{
+				handlersbyclasstype[handler.ClassType] = handler;
+			}
 		}
 
 		/// <summary>
@@ -114,8 +126,7 @@ namespace CodeImp.Boss
 				return GetTypeHandler(BossTypeCode.Null);
 
 			// See if we have a type handler for this kind of thing...
-			BossTypeHandler? handler = typehandlers.FirstOrDefault(h => (h != null) && h.ClassTypes.Contains(membertype));
-			if(handler != null)
+			if(handlersbyclasstype.TryGetValue(membertype, out BossTypeHandler handler))
 			{
 				return handler;
 			}
@@ -259,15 +270,19 @@ namespace CodeImp.Boss
 		// Helper method to get all serializable members from the specified type.
 		internal static List<MemberInfo> GetSerializableMembers(Type type)
 		{
-			List<MemberInfo> members =
-			[
-				.. type.GetFields(BindingFlags.Instance | BindingFlags.Public).Where(f => !f.IsInitOnly && !f.IsLiteral),
-				.. type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.CanRead && p.CanWrite),
-			];
-
-			return members
-				.Where(m => (m.GetCustomAttribute<BossIgnoreAttribute>(true) == null))
-				.ToList();
+			if(!serializablememberscache.TryGetValue(type, out List<MemberInfo> members))
+			{
+				List<MemberInfo> potentialmembers =
+				[
+					.. type.GetFields(BindingFlags.Instance | BindingFlags.Public).Where(f => !f.IsInitOnly && !f.IsLiteral),
+					.. type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.CanRead && p.CanWrite),
+				];
+				members = potentialmembers
+					.Where(m => (m.GetCustomAttribute<BossIgnoreAttribute>(true) == null))
+					.ToList();
+				serializablememberscache.Add(type, members);
+			}
+			return members;
 		}
 
 		// Helper method to get a specific serializable member from the specified type.

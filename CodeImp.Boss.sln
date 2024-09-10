@@ -5,7 +5,9 @@ VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeImp.Boss", "CodeImp.Boss\CodeImp.Boss.csproj", "{1889F7C2-DC4E-4E58-B916-4468ADE29E87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeImp.Boss.Tests", "CodeImp.Boss.Tests\CodeImp.Boss.Tests.csproj", "{EB5DB987-2B2A-479C-B91E-DA3461FF0032}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeImp.Boss.Tests", "CodeImp.Boss.Tests\CodeImp.Boss.Tests.csproj", "{EB5DB987-2B2A-479C-B91E-DA3461FF0032}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeImp.Boss.Performance", "CodeImp.Boss.Performance\CodeImp.Boss.Performance.csproj", "{3AC88257-DD39-491B-A945-57D6BBFB67F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{EB5DB987-2B2A-479C-B91E-DA3461FF0032}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB5DB987-2B2A-479C-B91E-DA3461FF0032}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB5DB987-2B2A-479C-B91E-DA3461FF0032}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3AC88257-DD39-491B-A945-57D6BBFB67F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AC88257-DD39-491B-A945-57D6BBFB67F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AC88257-DD39-491B-A945-57D6BBFB67F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AC88257-DD39-491B-A945-57D6BBFB67F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

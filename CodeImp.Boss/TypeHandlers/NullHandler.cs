@@ -4,7 +4,7 @@
 	{
 		public override byte BossType => (byte)BossTypeCode.Null;
 
-		public override IEnumerable<Type> ClassTypes => [];
+		public override Type? ClassType => null;
 
 		public override void WriteTo(BossWriter writer, object value)
 		{

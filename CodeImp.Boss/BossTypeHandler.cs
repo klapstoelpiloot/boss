@@ -9,9 +9,9 @@
         public abstract byte BossType { get; }
 
         /// <summary>
-        /// .NET class types that this handler will deal with.
+        /// .NET class type that this handler will deal with.
         /// </summary>
-        public abstract IEnumerable<Type> ClassTypes { get; }
+        public abstract Type? ClassType { get; }
 
         /// <summary>
         /// Called to serialized an object to stream.

@@ -4,7 +4,7 @@
 	{
 		public override byte BossType => (byte)BossTypeCode.Int;
 
-		public override IEnumerable<Type> ClassTypes => [typeof(int)];
+		public override Type ClassType => typeof(int);
 
 		public override void WriteTo(BossWriter writer, object value)
 		{
