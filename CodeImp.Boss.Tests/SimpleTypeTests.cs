@@ -3,17 +3,31 @@ namespace CodeImp.Boss.Tests
     internal class SimpleTypeTests : TestBase
     {
         [Test]
-        public void Integer()
+        public void Primitives()
         {
-            int i = 42;
-            MemoryStream stream = new MemoryStream();
-            BossSerializer.Serialize(i, stream);
+            TestPrimtiveType<bool>(true, "0A-00-00-00-00-00-00-00-01-01-00");
+            TestPrimtiveType<byte>(42, "0A-00-00-00-00-00-00-00-02-2A-00");
+            TestPrimtiveType<sbyte>(42, "0A-00-00-00-00-00-00-00-03-2A-00");
+            TestPrimtiveType<short>(42, "0B-00-00-00-00-00-00-00-04-2A-00-00");
+            TestPrimtiveType<ushort>(42, "0B-00-00-00-00-00-00-00-05-2A-00-00");
+            TestPrimtiveType<int>(42, "0D-00-00-00-00-00-00-00-06-2A-00-00-00-00");
+            TestPrimtiveType<uint>(42, "0D-00-00-00-00-00-00-00-07-2A-00-00-00-00");
+            TestPrimtiveType<long>(42, "11-00-00-00-00-00-00-00-08-2A-00-00-00-00-00-00-00-00");
+            TestPrimtiveType<ulong>(42, "11-00-00-00-00-00-00-00-09-2A-00-00-00-00-00-00-00-00");
+            TestPrimtiveType<float>(42.42f, "0D-00-00-00-00-00-00-00-0A-14-AE-29-42-00");
+            TestPrimtiveType<double>(42.42424242424242, "11-00-00-00-00-00-00-00-0B-36-D9-64-93-4D-36-45-40-00");
+        }
 
-            AssertStreamIsEqualTo(stream, "0D-00-00-00-00-00-00-00-06-2A-00-00-00-00");
+        private void TestPrimtiveType<T>(T value, string expecteddata)
+        {
+            MemoryStream stream = new MemoryStream();
+            BossSerializer.Serialize<T>(value, stream);
+
+            AssertStreamIsEqualTo(stream, expecteddata);
 
             stream.Position = 0;
-            int result = BossSerializer.Deserialize<int>(stream);
-            Assert.That(result, Is.EqualTo(42));
+            T result = BossSerializer.Deserialize<T>(stream);
+            Assert.That(result, Is.EqualTo(value));
         }
 
         public class ObjWithInt

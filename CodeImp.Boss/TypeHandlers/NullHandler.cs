@@ -3,7 +3,6 @@
     public class NullHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.Null;
-
 		public override Type? ClassType => null;
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)

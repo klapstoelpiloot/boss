@@ -1,18 +1,18 @@
 ﻿namespace CodeImp.Boss.TypeHandlers
 {
-    public class StringHandler : BossTypeHandler
+    public class LongHandler : BossTypeHandler
 	{
-		public override byte BossType => (byte)BossTypeCode.String;
-		public override Type ClassType => typeof(string);
+		public override byte BossType => (byte)BossTypeCode.Long;
+		public override Type ClassType => typeof(long);
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{
-			writer.Write((string?)value);
+			writer.Write((long)value);
 		}
 
 		public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
 		{
-			return reader.ReadString();
+			return reader.ReadInt64();
 		}
 	}
 }

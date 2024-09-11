@@ -64,7 +64,7 @@ namespace CodeImp.Boss.Tests.Performance
 	{
 		public Vector3 Position { get; set; }
 		public Vector3[] Trajectory { get; set; } = new Vector3[50];
-		public int[] Neighbours { get; set; } = new int[100];
+		public int[] Neighbours { get; set; } = new int[10];
 		public List<int> Visibility { get; set; } = new List<int>();
 		public List<TestData> Data { get; set; } = new List<TestData>();
 		[BossDynamic]
@@ -74,9 +74,9 @@ namespace CodeImp.Boss.Tests.Performance
 		{
 			Random rnd = new Random();
 			Position = new Vector3((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble());
-			Trajectory = Enumerable.Range(0, 1000).Select(v => new Vector3((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble())).ToArray();
-			Neighbours = Enumerable.Range(0, 1000).ToArray();
-			Visibility = Enumerable.Range(0, 1000).ToList();
+			Trajectory = Enumerable.Range(0, 10000).Select(v => new Vector3((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble())).ToArray();
+			Neighbours = Enumerable.Range(0, 10000).ToArray();
+			Visibility = Enumerable.Range(0, 10000).ToList();
 			Data = Enumerable.Range(0, 200).Select(x => new TestData()).ToList();
 			Data.ForEach(d => d.Fill());
 			DynamicData = Enumerable.Range(0, 200).Select(x => new TestExtraData()).Cast<TestData>().ToList();
@@ -95,29 +95,29 @@ namespace CodeImp.Boss.Tests.Performance
 		}
 	}
 
-    public class Vector3TypeHandler : BossTypeHandler
-    {
-        public override byte BossType => 64;
+	public class Vector3TypeHandler : BossTypeHandler
+	{
+		public override byte BossType => 64;
 
-        public override Type ClassType => typeof(Vector3);
+		public override Type ClassType => typeof(Vector3);
 
-        public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
-        {
-            Vector3 v = new Vector3();
-            v.x = reader.ReadSingle();
-            v.y = reader.ReadSingle();
-            v.z = reader.ReadSingle();
-            return v;
-        }
+		public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
+		{
+			Vector3 v = new Vector3();
+			v.x = reader.ReadSingle();
+			v.y = reader.ReadSingle();
+			v.z = reader.ReadSingle();
+			return v;
+		}
 
-        public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
-        {
-            Vector3 v = (Vector3)value;
-            writer.Write(v.x);
-            writer.Write(v.y);
-            writer.Write(v.z);
-        }
-    }
+		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
+		{
+			Vector3 v = (Vector3)value;
+			writer.Write(v.x);
+			writer.Write(v.y);
+			writer.Write(v.z);
+		}
+	}
 
 
 	public class PerformanceTest

@@ -3,7 +3,6 @@
     public class FloatHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.Float;
-
 		public override Type? ClassType => typeof(float);
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)

@@ -5,7 +5,6 @@ namespace CodeImp.Boss.TypeHandlers
 	public class FixedObjectHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.FixedObject;
-
 		public override Type? ClassType => null;
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
