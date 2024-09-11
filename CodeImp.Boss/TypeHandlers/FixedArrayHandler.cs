@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace CodeImp.Boss.TypeHandlers
@@ -127,7 +129,7 @@ namespace CodeImp.Boss.TypeHandlers
 				if(addmethod != null)
 				{
 					for(int i = 0; i < array.Length; i++)
-						addmethod.Invoke(collection, [array[i]]);
+						addmethod.Invoke(collection, new object[] {array[i]});
 					return collection;
 				}
 
@@ -136,7 +138,7 @@ namespace CodeImp.Boss.TypeHandlers
 				if(enqueuemethod != null)
 				{
 					for(int i = 0; i < array.Length; i++)
-						enqueuemethod.Invoke(collection, [array[i]]);
+						enqueuemethod.Invoke(collection, new object[] {array[i]});
 					return collection;
 				}
 
@@ -145,7 +147,7 @@ namespace CodeImp.Boss.TypeHandlers
 				if(pushmethod != null)
 				{
 					for(int i = 0; i < array.Length; i++)
-						pushmethod.Invoke(collection, [array[i]]);
+						pushmethod.Invoke(collection, new object[] {array[i]});
 					return collection;
 				}
 

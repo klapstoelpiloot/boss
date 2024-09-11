@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace CodeImp.Boss
+﻿namespace CodeImp.Boss
 {
     /// <summary>
     /// Type code values used in the Boss data format.

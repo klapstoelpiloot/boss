@@ -1,4 +1,6 @@
-﻿namespace CodeImp.Boss
+﻿using System;
+
+namespace CodeImp.Boss
 {
 	/// <summary>
 	/// This attribute indicates that the property or field that it is applied to must always be serialized as a dynamic object.

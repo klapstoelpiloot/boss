@@ -1,4 +1,6 @@
-﻿namespace CodeImp.Boss
+﻿using System;
+
+namespace CodeImp.Boss
 {
     public abstract class BossTypeHandler
     {

@@ -1,4 +1,6 @@
-﻿namespace CodeImp.Boss.TypeHandlers
+﻿using System;
+
+namespace CodeImp.Boss.TypeHandlers
 {
     public class ByteHandler : BossTypeHandler
 	{

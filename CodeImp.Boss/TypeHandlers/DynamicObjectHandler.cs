@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+
 namespace CodeImp.Boss.TypeHandlers
 {
 	public class DynamicObjectHandler : FixedObjectHandler

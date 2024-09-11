@@ -1,6 +1,11 @@
 ﻿using CodeImp.Boss.TypeHandlers;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 namespace CodeImp.Boss
 {
@@ -12,8 +17,8 @@ namespace CodeImp.Boss
 		private static readonly ReaderWriterLock handlerslock = new ReaderWriterLock();
 
 		// Lookup caches
-		private readonly Dictionary<string, Type> typenamelookup = [];
-		private readonly Dictionary<Type, List<MemberInfo>> serializablememberscache = [];
+		private readonly Dictionary<string, Type> typenamelookup = new Dictionary<string, Type>();
+		private readonly Dictionary<Type, List<MemberInfo>> serializablememberscache = new Dictionary<Type, List<MemberInfo>>();
 
 		// Static constructor
 		static BossSerializer()
@@ -21,7 +26,7 @@ namespace CodeImp.Boss
 			// Register all built-in type handlers
 			Type basetype = typeof(BossTypeHandler);
 			List<Type> handlertypes = Assembly.GetExecutingAssembly().GetTypes()
-			                          .Where(t => !t.IsAbstract && t.IsAssignableTo(basetype)).ToList();
+			                          .Where(t => !t.IsAbstract && basetype.IsAssignableFrom(t)).ToList();
 			foreach(Type t in handlertypes)
 			{
 				if(Activator.CreateInstance(t) is BossTypeHandler handler)
@@ -203,11 +208,11 @@ namespace CodeImp.Boss
 		internal Type? FindType(string typename, Type basetype)
 		{
 			// Can we get a quick result from cache?
-			if(typenamelookup.TryGetValue(typename, out Type? type) && type.IsAssignableTo(basetype))
+			if(typenamelookup.TryGetValue(typename, out Type? type) && basetype.IsAssignableFrom(type))
 				return type;
 
 			// Chances are high that the specified type resides in the same assembly as the base type
-			type = basetype.Assembly.GetTypes().FirstOrDefault(t => (t.Name == typename) && t.IsAssignableTo(basetype));
+			type = basetype.Assembly.GetTypes().FirstOrDefault(t => (t.Name == typename) && basetype.IsAssignableFrom(t));
 			if(type != null)
 			{
 				typenamelookup[type.Name] = type;
@@ -217,7 +222,7 @@ namespace CodeImp.Boss
 			// Search for the type in all other assemblies... this is slow.
 			foreach(Assembly a in AppDomain.CurrentDomain.GetAssemblies().Where(a => a != basetype.Assembly))
 			{
-				type = a.GetTypes().FirstOrDefault(t => (t.Name == typename) && t.IsAssignableTo(basetype));
+				type = a.GetTypes().FirstOrDefault(t => (t.Name == typename) && basetype.IsAssignableFrom(t));
 				if(type != null)
 				{
 					typenamelookup[type.Name] = type;
@@ -280,11 +285,9 @@ namespace CodeImp.Boss
 		{
 			if(!serializablememberscache.TryGetValue(type, out List<MemberInfo> members))
 			{
-				List<MemberInfo> potentialmembers =
-				[
-					.. type.GetFields(BindingFlags.Instance | BindingFlags.Public).Where(f => !f.IsInitOnly && !f.IsLiteral),
-					.. type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.CanRead && p.CanWrite),
-				];
+				List<MemberInfo> potentialmembers = new List<MemberInfo>();
+				potentialmembers.AddRange(type.GetFields(BindingFlags.Instance | BindingFlags.Public).Where(f => !f.IsInitOnly && !f.IsLiteral));
+				potentialmembers.AddRange(type.GetProperties(BindingFlags.Instance | BindingFlags.Public).Where(p => p.CanRead && p.CanWrite));
 				members = potentialmembers
 					.Where(m => (m.GetCustomAttribute<BossIgnoreAttribute>(true) == null))
 					.ToList();
