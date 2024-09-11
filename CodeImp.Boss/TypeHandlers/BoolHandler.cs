@@ -3,7 +3,7 @@
     public class BoolHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.Bool;
-		public override Type ClassType => typeof(bool);
+		public override Type? ClassType => typeof(bool);
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{

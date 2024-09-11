@@ -3,7 +3,7 @@
     public class UIntHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.UInt;
-		public override Type ClassType => typeof(uint);
+		public override Type? ClassType => typeof(uint);
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{

@@ -1,18 +1,18 @@
 ﻿namespace CodeImp.Boss.TypeHandlers
 {
-    public class SByteHandler : BossTypeHandler
+    public class FixedDictionaryHandler : BossTypeHandler
 	{
-		public override byte BossType => (byte)BossTypeCode.SByte;
-		public override Type? ClassType => typeof(sbyte);
+		public override byte BossType => (byte)BossTypeCode.FixedDictionary;
+		public override Type? ClassType => null;
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{
-			writer.Write((sbyte)value);
+			throw new NotImplementedException();
 		}
 
 		public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
 		{
-			return reader.ReadSByte();
+			throw new NotImplementedException();
 		}
 	}
 }

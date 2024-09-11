@@ -3,7 +3,7 @@
     public class ByteHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.Byte;
-		public override Type ClassType => typeof(byte);
+		public override Type? ClassType => typeof(byte);
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{

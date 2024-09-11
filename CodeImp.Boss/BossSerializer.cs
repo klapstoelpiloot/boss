@@ -160,7 +160,8 @@ namespace CodeImp.Boss
 				}
 			}
 			// Pick a generic type handler for struct or class objects
-			else if(membertype.IsInterface || membertype.IsAbstract || (membertype != objecttype))
+			else if(membertype.IsInterface || membertype.IsAbstract || (membertype != objecttype) ||
+					Attribute.IsDefined(membertype, typeof(BossDynamicAttribute)))
 			{
 				// When the object type can differ from the member base type, we need to use
 				// the DynamicObject handler, which also serializes the object class name...

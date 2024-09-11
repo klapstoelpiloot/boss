@@ -3,7 +3,7 @@
     public class UShortHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.UShort;
-		public override Type ClassType => typeof(ushort);
+		public override Type? ClassType => typeof(ushort);
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{

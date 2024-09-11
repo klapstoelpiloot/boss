@@ -24,8 +24,8 @@ Custom element types can be implemented by way of extension. For example **Vecto
 
 **Dynamic Array**: First a `vlq` indicating the number of items. The each element follows, beginning with a `byte` for the typecode of the element.
 
-**Fixed Dictionary**: Key-value pairs with string keys and one type for all values. A single `byte` indicates the type of all values. Then a `vlq` follows for the number of elements. Each element begins with a `vlq` for the index in the strings table for the key. The bytes after that depend on the element type.
+**Fixed Dictionary**: Key-value pairs with one type of all keys and one type for all values. First `byte` indicates the type of the key. A second `byte` indicates the type of all values. Then a `vlq` follows for the number of elements. Then the key is written according to its type and then the value is written according to its type.
 
-**Dynamic Dictionary**: Key-value pairs with string keys and each value can be of a different type. First a `vlq` for the number of elements. Each element is the same as for an object.
+**Dynamic Dictionary**: Key-value pairs with variable type keys and variable type values. First a `vlq` for the number of elements. Then for each there is a `byte` that indicates the type of the key and a `byte` for the type of the value. Then the key is written according to its type and then the value is written according to its type.
 
 After all elements follows the strings table. Every string starts with a `vlq` for the length of the string in number of bytes (not characters) and then follows the string in UTF8 format. There is no null terminator.

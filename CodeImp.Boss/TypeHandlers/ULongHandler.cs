@@ -3,7 +3,7 @@
     public class ULongHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.ULong;
-		public override Type ClassType => typeof(ulong);
+		public override Type? ClassType => typeof(ulong);
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{

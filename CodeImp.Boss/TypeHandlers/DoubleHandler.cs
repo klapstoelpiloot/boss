@@ -3,7 +3,7 @@
     public class DoubleHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.Double;
-		public override Type ClassType => typeof(double);
+		public override Type? ClassType => typeof(double);
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{

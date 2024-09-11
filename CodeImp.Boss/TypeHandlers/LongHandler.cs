@@ -3,7 +3,7 @@
     public class LongHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.Long;
-		public override Type ClassType => typeof(long);
+		public override Type? ClassType => typeof(long);
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{
