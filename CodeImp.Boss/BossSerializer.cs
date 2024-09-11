@@ -4,19 +4,18 @@ using System.Reflection;
 
 namespace CodeImp.Boss
 {
-	public static class BossSerializer
+	public class BossSerializer
 	{
-		// The type handlers by boss typecode
+		// The type handlers
 		private static readonly BossTypeHandler[] typehandlers = new BossTypeHandler[256];
 		private static readonly Dictionary<Type, BossTypeHandler> handlersbyclasstype = new Dictionary<Type, BossTypeHandler>();
+		private static readonly ReaderWriterLock handlerslock = new ReaderWriterLock();
 
-		// Lookup cache for Types by their classname only
-		private static readonly Dictionary<string, Type> typenamelookup = [];
+		// Lookup caches
+		private readonly Dictionary<string, Type> typenamelookup = [];
+		private readonly Dictionary<Type, List<MemberInfo>> serializablememberscache = [];
 
-		// Lookup cache for class/struct members
-		private static readonly Dictionary<Type, List<MemberInfo>> serializablememberscache = [];
-
-		// Constructor
+		// Static constructor
 		static BossSerializer()
 		{
 			// Register all built-in type handlers
@@ -30,18 +29,28 @@ namespace CodeImp.Boss
 			}
 		}
 
+		// Instance constructor
+		private BossSerializer()
+		{
+		}
+
 		/// <summary>
 		/// Registers a type handler for the specified Boss typecode.
 		/// </summary>
 		private static void RegisterTypeHandlerInternal(BossTypeHandler handler)
 		{
-			if(handler.BossType > (int)BossTypeCode.LastBuiltIn)
-				throw new InvalidOperationException("Built-in type handlers should be in the range 0 .. 63");
-
-			typehandlers[handler.BossType] = handler;
-			if(handler.ClassType != null)
+			handlerslock.AcquireWriterLock(TimeSpan.FromSeconds(1));
+			try
 			{
-				handlersbyclasstype[handler.ClassType] = handler;
+				typehandlers[handler.BossType] = handler;
+				if(handler.ClassType != null)
+				{
+					handlersbyclasstype[handler.ClassType] = handler;
+				}
+			}
+			finally
+			{
+				handlerslock.ReleaseWriterLock();
 			}
 		}
 
@@ -53,27 +62,7 @@ namespace CodeImp.Boss
 			if(handler.BossType <= (int)BossTypeCode.LastBuiltIn)
 				throw new InvalidOperationException("Extension type handlers should be in the range 64 .. 255");
 
-			typehandlers[handler.BossType] = handler;
-			if(handler.ClassType != null)
-			{
-				handlersbyclasstype[handler.ClassType] = handler;
-			}
-		}
-
-		/// <summary>
-		/// Adds a Type to the lookup cache to improve the performance of Type instantiation during deserialization.
-		/// </summary>
-		public static void AddTypeLookupCache(Type t)
-		{
-			typenamelookup[t.Name] = t;
-		}
-
-		/// <summary>
-		/// Clears the Type lookup cache.
-		/// </summary>
-		public static void ClearTypeLookupCache()
-		{
-			typenamelookup.Clear();
+			RegisterTypeHandlerInternal(handler);
 		}
 
 		/// <summary>
@@ -82,10 +71,19 @@ namespace CodeImp.Boss
 		/// </summary>
 		public static void Serialize<T>(T obj, Stream stream)
 		{
-			using BossWriter writer = new BossWriter(stream);
-			writer.BeginWriting();
-			Serialize(obj, typeof(T), writer);
-			writer.EndWriting();
+			handlerslock.AcquireReaderLock(TimeSpan.FromSeconds(1));
+			try
+			{
+				BossSerializer serializer = new BossSerializer();
+				using BossWriter writer = new BossWriter(stream);
+				writer.BeginWriting();
+				serializer.Serialize(obj, typeof(T), writer);
+				writer.EndWriting();
+			}
+			finally
+			{
+				handlerslock.ReleaseReaderLock();
+			}
 		}
 
 		/// <summary>
@@ -94,21 +92,30 @@ namespace CodeImp.Boss
 		/// </summary>
 		public static T? Deserialize<T>(Stream stream)
 		{
-			using BossReader reader = new BossReader(stream);
-			reader.BeginReading();
-			return (T?)Deserialize(reader, typeof(T));
+			handlerslock.AcquireReaderLock(TimeSpan.FromSeconds(1));
+			try
+			{
+				BossSerializer serializer = new BossSerializer();
+				using BossReader reader = new BossReader(stream);
+				reader.BeginReading();
+				return (T?)serializer.Deserialize(reader, typeof(T));
+			}
+			finally
+			{
+				handlerslock.ReleaseReaderLock();
+			}
 		}
 
 		// Returns the handler for the specified Boss type code
-		internal static BossTypeHandler GetTypeHandler(BossTypeCode typecode)
+		internal BossTypeHandler GetTypeHandler(BossTypeCode typecode)
 		{
 			return typehandlers[(byte)typecode];
 		}
 
 		/// <summary>
-		/// Returns the handler for the specified Boss type code
+		/// Returns the handler for the specified Boss type code.
 		/// </summary>
-		public static BossTypeHandler GetTypeHandler(byte typecode)
+		public BossTypeHandler GetTypeHandler(byte typecode)
 		{
 			return typehandlers[typecode];
 		}
@@ -119,7 +126,7 @@ namespace CodeImp.Boss
 		/// The argument objecttype is the actual object's type, which may be different.
 		/// Set it to null when the object is null.
 		/// </summary>
-		public static BossTypeHandler SelectTypeHandler(Type membertype, Type? objecttype)
+		public BossTypeHandler SelectTypeHandler(Type membertype, Type? objecttype)
 		{
 			// Null is just that. Null.
 			if(objecttype is null)
@@ -167,32 +174,32 @@ namespace CodeImp.Boss
 		}
 
 		// Serializes the given object
-		internal static void Serialize(object? obj, Type type, BossWriter writer)
+		internal void Serialize(object? obj, Type type, BossWriter writer)
 		{
 			BossTypeHandler? handler = SelectTypeHandler(type, obj?.GetType() ?? null);
 			SerializeWithHandler(obj, handler, writer);
 		}
 
 		// Deserializes an object
-		internal static object? Deserialize(BossReader reader, Type basetype)
+		internal object? Deserialize(BossReader reader, Type basetype)
 		{
 			byte typecode = reader.ReadByte();
 			BossTypeHandler handler = typehandlers[typecode];
-			return handler.ReadFrom(reader, basetype);
+			return handler.ReadFrom(this, reader, basetype);
 		}
 
 		// Serializes the given object using the specified type handler.
-		internal static void SerializeWithHandler(object? obj, BossTypeHandler handler, BossWriter writer)
+		internal void SerializeWithHandler(object? obj, BossTypeHandler handler, BossWriter writer)
 		{
 			writer.Write(handler.BossType);
 			if(obj != null)
 			{
-				handler.WriteTo(writer, obj);
+				handler.WriteTo(this, writer, obj);
 			}
 		}
 
 		// This tries to find a type by its name and basetype.
-		internal static Type? FindType(string typename, Type basetype)
+		internal Type? FindType(string typename, Type basetype)
 		{
 			// Can we get a quick result from cache?
 			if(typenamelookup.TryGetValue(typename, out Type? type) && type.IsAssignableTo(basetype))
@@ -202,7 +209,7 @@ namespace CodeImp.Boss
 			type = basetype.Assembly.GetTypes().FirstOrDefault(t => (t.Name == typename) && t.IsAssignableTo(basetype));
 			if(type != null)
 			{
-				AddTypeLookupCache(type);
+				typenamelookup[type.Name] = type;
 				return type;
 			}
 
@@ -212,7 +219,7 @@ namespace CodeImp.Boss
 				type = a.GetTypes().FirstOrDefault(t => (t.Name == typename) && t.IsAssignableTo(basetype));
 				if(type != null)
 				{
-					AddTypeLookupCache(type);
+					typenamelookup[type.Name] = type;
 					return type;
 				}
 			}
@@ -268,7 +275,7 @@ namespace CodeImp.Boss
 		}
 
 		// Helper method to get all serializable members from the specified type.
-		internal static List<MemberInfo> GetSerializableMembers(Type type)
+		public List<MemberInfo> GetSerializableMembers(Type type)
 		{
 			if(!serializablememberscache.TryGetValue(type, out List<MemberInfo> members))
 			{
@@ -286,7 +293,7 @@ namespace CodeImp.Boss
 		}
 
 		// Helper method to get a specific serializable member from the specified type.
-		internal static MemberInfo? FindSerializableMember(Type type, string name)
+		public MemberInfo? FindSerializableMember(Type type, string name)
 		{
 			List<MemberInfo> members = GetSerializableMembers(type);
 			return members.FirstOrDefault(m => m.Name == name);

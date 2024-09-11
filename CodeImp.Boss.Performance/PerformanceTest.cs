@@ -101,7 +101,7 @@ namespace CodeImp.Boss.Tests.Performance
 
         public override Type ClassType => typeof(Vector3);
 
-        public override object? ReadFrom(BossReader reader, Type basetype)
+        public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
         {
             Vector3 v = new Vector3();
             v.x = reader.ReadSingle();
@@ -110,7 +110,7 @@ namespace CodeImp.Boss.Tests.Performance
             return v;
         }
 
-        public override void WriteTo(BossWriter writer, object value)
+        public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
         {
             Vector3 v = (Vector3)value;
             writer.Write(v.x);
@@ -122,38 +122,41 @@ namespace CodeImp.Boss.Tests.Performance
 
 	public class PerformanceTest
 	{
-		public void RunBossBatches()
+		public void RunBossBatches(int repeats)
 		{
 			BossSerializer.RegisterTypeHandler(new Vector3TypeHandler());
+			Console.Write($"Batch of {repeats} repeats - Boss... ");
 
 			// Do a single run which we do not measure, to ensure
 			// the JIT is not messing with out measurement.
-			BatchRunBoss(out long bosssize);
+			BatchRunBoss(1);
 			Thread.Sleep(100);
 
 			List<long> times = new List<long>();
 			for(int i = 0; i < 5; i++)
 			{
-				long ms = BatchRunBoss(out _);
+				long ms = BatchRunBoss(repeats);
 				times.Add(ms);
 			}
-			Console.WriteLine($"SerializeToMemory - Boss took {times.Average()} ms.");
+			Console.WriteLine($"{(int)Math.Round(times.Average())} ms.");
 		}
 
-		public void RunJsonBatches()
+		public void RunJsonBatches(int repeats)
 		{
+			Console.Write($"Batch of {repeats} repeats - Json... ");
+
 			// Do a single run which we do not measure, to ensure
 			// the JIT is not messing with out measurement.
-			BatchRunJson(out long jsonsize);
+			BatchRunJson(1);
 			Thread.Sleep(100);
 
 			List<long> times = new List<long>();
 			for(int i = 0; i < 5; i++)
 			{
-				long ms = BatchRunJson(out _);
+				long ms = BatchRunJson(repeats);
 				times.Add(ms);
 			}
-			Console.WriteLine($"SerializeToMemory - Json took {times.Average()} ms.");
+			Console.WriteLine($"{(int)Math.Round(times.Average())} ms.");
 		}
 
 		public MemoryStream SingleRunBoss()
@@ -174,43 +177,44 @@ namespace CodeImp.Boss.Tests.Performance
 			return result;
 		}
 
-		private long BatchRunBoss(out long datasize)
+		private long BatchRunBoss(int repeats)
 		{
 			// Initialize data
 			using MemoryStream stream = new MemoryStream(1000000);
 			TestPile tp = MakePile();
-			BossSerializer.Serialize(tp, stream);
-			datasize = stream.Length;
 
 			Stopwatch stopwatch = Stopwatch.StartNew();
 
-			for(int i = 0; i < 100; i++)
+			for(int i = 0; i < repeats; i++)
 			{
 				// Write to stream
 				stream.Seek(0, SeekOrigin.Begin);
 				BossSerializer.Serialize(tp, stream);
-				datasize = stream.Length;
+
+				// Read from stream
+				stream.Seek(0, SeekOrigin.Begin);
+				BossSerializer.Deserialize<TestPile>(stream);
 			}
 
 			stopwatch.Stop();
 			return stopwatch.ElapsedMilliseconds;
 		}
 
-		private long BatchRunJson(out long datasize)
+		private long BatchRunJson(int repeats)
 		{
 			// Initialize data
 			string result = string.Empty;
 			TestPile tp = MakePile();
-			result = JsonSerializer.Serialize(tp);
-			datasize = result.Length;
 
 			Stopwatch stopwatch = Stopwatch.StartNew();
 
-			for(int i = 0; i < 100; i++)
+			for(int i = 0; i < repeats; i++)
 			{
 				// Write to stream
 				result = JsonSerializer.Serialize(tp);
-				datasize = result.Length;
+
+				// Read from stream
+				JsonSerializer.Deserialize<TestPile>(result);
 			}
 
 			stopwatch.Stop();

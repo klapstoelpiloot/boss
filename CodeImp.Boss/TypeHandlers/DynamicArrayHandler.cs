@@ -9,7 +9,7 @@ namespace CodeImp.Boss.TypeHandlers
 
 		public override Type? ClassType => null;
 
-		public override void WriteTo(BossWriter writer, object value)
+		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{
 			Type elementtype = BossSerializer.GetCollectionElementType(value.GetType());
 			int elementcount = BossSerializer.GetCollectionElementCount(value.GetType(), value);
@@ -19,11 +19,11 @@ namespace CodeImp.Boss.TypeHandlers
 			IEnumerable enumerable = value as IEnumerable;
 			foreach(object? e in enumerable)
 			{
-				BossSerializer.Serialize(e, elementtype, writer);
+				serializer.Serialize(e, elementtype, writer);
 			}
 		}
 
-		public override object? ReadFrom(BossReader reader, Type basetype)
+		public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
 		{
 			int elementcount = reader.ReadVLQ();
 			Type elementtype = BossSerializer.GetCollectionElementType(basetype);
@@ -31,7 +31,7 @@ namespace CodeImp.Boss.TypeHandlers
 			object?[] list = new object?[elementcount];
 			for(int i = 0; i < elementcount; i++)
 			{
-				list[i] = BossSerializer.Deserialize(reader, elementtype);
+				list[i] = serializer.Deserialize(reader, elementtype);
 			}
 
 			if(basetype.IsArray)

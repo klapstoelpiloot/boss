@@ -34,7 +34,7 @@
 
             public override Type ClassType => typeof(Vector3);
 
-            public override object? ReadFrom(BossReader reader, Type basetype)
+            public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
             {
                 Vector3 v = new Vector3();
                 v.x = reader.ReadSingle();
@@ -43,7 +43,7 @@
                 return v;
             }
 
-            public override void WriteTo(BossWriter writer, object value)
+            public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
             {
                 Vector3 v = (Vector3)value;
                 writer.Write(v.x);

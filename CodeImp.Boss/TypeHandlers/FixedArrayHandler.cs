@@ -9,11 +9,11 @@ namespace CodeImp.Boss.TypeHandlers
 
 		public override Type? ClassType => null;
 
-		public override void WriteTo(BossWriter writer, object value)
+		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{
 			Type elementtype = BossSerializer.GetCollectionElementType(value.GetType());
 			int elementcount = BossSerializer.GetCollectionElementCount(value.GetType(), value);
-			BossTypeHandler handler = BossSerializer.SelectTypeHandler(elementtype, elementtype);
+			BossTypeHandler handler = serializer.SelectTypeHandler(elementtype, elementtype);
 
 			writer.WriteVLQ(elementcount);
 			writer.Write(handler.BossType);
@@ -24,21 +24,21 @@ namespace CodeImp.Boss.TypeHandlers
 			IEnumerable enumerable = value as IEnumerable;
 			foreach(object e in enumerable)
 			{
-				handler.WriteTo(writer, e);
+				handler.WriteTo(serializer, writer, e);
 			}
 		}
 
-		public override object? ReadFrom(BossReader reader, Type basetype)
+		public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
 		{
 			int elementcount = reader.ReadVLQ();
 			byte elementtypecode = reader.ReadByte();
-			BossTypeHandler handler = BossSerializer.GetTypeHandler(elementtypecode);
+			BossTypeHandler handler = serializer.GetTypeHandler(elementtypecode);
 			Type elementtype = BossSerializer.GetCollectionElementType(basetype);
 
 			// Again with the boxing...
 			object[] list = new object[elementcount];
 			for(int i = 0; i < elementcount; i++)
-				list[i] = handler.ReadFrom(reader, elementtype);
+				list[i] = handler.ReadFrom(serializer, reader, elementtype);
 
 			if(basetype.IsArray)
 			{

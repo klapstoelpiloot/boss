@@ -16,11 +16,11 @@
         /// <summary>
         /// Called to serialized an object to stream.
         /// </summary>
-        public abstract void WriteTo(BossWriter writer, object value);
+        public abstract void WriteTo(BossSerializer serializer, BossWriter writer, object value);
 
         /// <summary>
         /// Called to deserialize an object from stream.
         /// </summary>
-        public abstract object? ReadFrom(BossReader reader, Type basetype);
+        public abstract object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype);
     }
 }
