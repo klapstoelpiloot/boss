@@ -14,7 +14,7 @@ namespace CodeImp.Boss.TypeHandlers
 		{
 			Type elementtype = BossSerializer.GetCollectionElementType(value.GetType());
 			int elementcount = BossSerializer.GetCollectionElementCount(value.GetType(), value);
-			BossTypeHandler handler = serializer.SelectTypeHandler(elementtype, elementtype);
+			BossTypeHandler handler = serializer.SelectTypeHandler(elementtype, elementtype, false);
 
 			writer.WriteVLQ(elementcount);
 			writer.Write(handler.BossType);

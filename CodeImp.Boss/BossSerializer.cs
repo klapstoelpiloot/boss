@@ -82,7 +82,7 @@ namespace CodeImp.Boss
 				BossSerializer serializer = new BossSerializer();
 				using BossWriter writer = new BossWriter(stream);
 				writer.BeginWriting();
-				serializer.Serialize(obj, typeof(T), writer);
+				serializer.Serialize(obj, typeof(T), writer, false);
 				writer.EndWriting();
 			}
 			finally
@@ -131,7 +131,7 @@ namespace CodeImp.Boss
 		/// The argument objecttype is the actual object's type, which may be different.
 		/// Set it to null when the object is null.
 		/// </summary>
-		public BossTypeHandler SelectTypeHandler(Type membertype, Type? objecttype)
+		public BossTypeHandler SelectTypeHandler(Type membertype, Type? objecttype, bool forcedynamic)
 		{
 			// Null is just that. Null.
 			if(objecttype is null)
@@ -165,8 +165,7 @@ namespace CodeImp.Boss
 				}
 			}
 			// Pick a generic type handler for struct or class objects
-			else if(membertype.IsInterface || membertype.IsAbstract || (membertype != objecttype) ||
-					Attribute.IsDefined(membertype, typeof(BossDynamicAttribute)))
+			else if(membertype.IsInterface || membertype.IsAbstract || (membertype != objecttype) || forcedynamic)
 			{
 				// When the object type can differ from the member base type, we need to use
 				// the DynamicObject handler, which also serializes the object class name...
@@ -180,9 +179,9 @@ namespace CodeImp.Boss
 		}
 
 		// Serializes the given object
-		internal void Serialize(object? obj, Type type, BossWriter writer)
+		internal void Serialize(object? obj, Type type, BossWriter writer, bool forcedynamic)
 		{
-			BossTypeHandler? handler = SelectTypeHandler(type, obj?.GetType() ?? null);
+			BossTypeHandler? handler = SelectTypeHandler(type, obj?.GetType() ?? null, forcedynamic);
 			SerializeWithHandler(obj, handler, writer);
 		}
 

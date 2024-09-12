@@ -54,13 +54,14 @@ namespace CodeImp.Boss.Tests
 
         public class ObjWithClassObj
         {
-            public ObjWithInt? ClassObj { get; set; }
+            public ObjWithInt? ClassObj { get; set; } = new ObjWithInt();
         }
 
         [Test]
         public void ObjectWithNullProperty()
         {
             ObjWithClassObj obj = new ObjWithClassObj();
+			obj.ClassObj = null;
             MemoryStream stream = new MemoryStream();
             BossSerializer.Serialize(obj, stream);
 
@@ -70,6 +71,49 @@ namespace CodeImp.Boss.Tests
             ObjWithClassObj? result = BossSerializer.Deserialize<ObjWithClassObj>(stream);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<ObjWithClassObj>());
+            Assert.That(result.ClassObj, Is.Null);
+        }
+
+        public class ObjWithClassObjDefaultNull
+        {
+            public ObjWithInt? ClassObj { get; set; } = null;
+        }
+
+        [Test]
+        public void ObjectWithDefaultNullProperty()
+        {
+            ObjWithClassObjDefaultNull obj = new ObjWithClassObjDefaultNull();
+            MemoryStream stream = new MemoryStream();
+            BossSerializer.Serialize(obj, stream);
+
+            AssertStreamIsEqualTo(stream, "0A-00-00-00-00-00-00-00-0F-00-00");
+
+            stream.Seek(0, SeekOrigin.Begin);
+            ObjWithClassObjDefaultNull? result = BossSerializer.Deserialize<ObjWithClassObjDefaultNull>(stream);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<ObjWithClassObjDefaultNull>());
+            Assert.That(result.ClassObj, Is.Null);
+        }
+
+        public class ObjWithClassObjDefaultNullInclude
+        {
+			[BossSerializable(DefaultValueBehavior = DefaultValueBehavior.Include)]
+            public ObjWithInt? ClassObj { get; set; } = null;
+        }
+
+        [Test]
+        public void ObjectWithIncludeDefaultNullProperty()
+        {
+            ObjWithClassObjDefaultNullInclude obj = new ObjWithClassObjDefaultNullInclude();
+            MemoryStream stream = new MemoryStream();
+            BossSerializer.Serialize(obj, stream);
+
+            AssertStreamIsEqualTo(stream, "0C-00-00-00-00-00-00-00-0F-01-01-00-01-08-43-6C-61-73-73-4F-62-6A");
+
+            stream.Seek(0, SeekOrigin.Begin);
+            ObjWithClassObjDefaultNullInclude? result = BossSerializer.Deserialize<ObjWithClassObjDefaultNullInclude>(stream);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<ObjWithClassObjDefaultNullInclude>());
             Assert.That(result.ClassObj, Is.Null);
         }
 
