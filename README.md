@@ -43,14 +43,14 @@ A type handler controls how a specific datatype is serialized and deserialized. 
 
 For example, in Unity there is a `Vector3` struct which has 3 float members: x, y and z. Without a custom type handler, this struct is serialized inefficiently. For each member the name and the data type are serialized. But this struct is unlikely to change in the future, so you can write a more efficient type handler which serializes the `Vector3` simply to 3 floating points (3 x 4 bytes).
 
-A type handlers must derive from the abstract `BossTypeHandler` class. It must also have a unique number in the range of 64 through 255 (inclusive) which is called the type code. This means you are limited to 192 custom type handlers. The type handler implements serialization in the `WriteTo` method and deserialization in the `ReadFrom` method. Note that the type handler must be stateless and thread-safe. This means you cannot temporarily store data in class members.
+A type handler must derive from the abstract `BossTypeHandler` class. It must also have a unique number in the range of 64 through 255 (inclusive) which is called the type code. This means you are limited to 192 custom type handlers. The type handler implements serialization in the `WriteTo` method and deserialization in the `ReadFrom` method. Note that the type handler must be stateless and thread-safe. This means you cannot temporarily store data in class members.
 
 Here is a good example for the Unity Vector3:
 ```C#
 public class Vector3Handler : BossTypeHandler
 {
     // This is the Boss typecode that this handler will deal with.
-    public override byte BossType => (byte)ExtendedTypeCode.Vector3;
+    public override byte BossType => 64;
     
     // .NET class type that this handler will deal with.
     public override Type? ClassType => typeof(Vector3);
@@ -76,11 +76,10 @@ public class Vector3Handler : BossTypeHandler
     }
 }
 ```
-You must register your custom type handler with the `BossSerializer` class by calling the `RegisterTypeHandler` method somewhere at the start of your application.
+You must register your custom type handler by calling the `RegisterTypeHandler` method on the `BossSerializer` class, somewhere at the start of your application.
 ```C#
 BossSerializer.RegisterTypeHandler(new Vector3Handler());
 ```
-
 
 ## Storage format
 In this notation we use the datatype indication `vlq` for a flexible number of bytes indicating an integer number (VLQ code) up to the size of an int (2,147,483,647). For more information see https://en.m.wikipedia.org/wiki/Variable-length_quantity
