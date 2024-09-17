@@ -6,8 +6,13 @@ namespace CodeImp.Boss.Tests
     {
         public class ObjWithAllFields
         {
+            [BossSerializable(DefaultValueBehavior = DefaultValueBehavior.Include)]
             public string name = "Darth Vader";
+
+            [BossSerializable(DefaultValueBehavior = DefaultValueBehavior.Include)]
             public int number = 42;
+
+            [BossSerializable(DefaultValueBehavior = DefaultValueBehavior.Include)]
             public double smallnumber = 3.1415926535897932384626;
         }
 
