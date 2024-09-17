@@ -4,7 +4,7 @@ using System.Reflection;
 string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
 PerformanceTest test = new PerformanceTest();
-const int REPEATS = 100;
+const int REPEATS = 20;
 
 OutputFiles();
 test.RunBossBatches(REPEATS);

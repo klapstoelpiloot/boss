@@ -1,6 +1,6 @@
 # Binary Object Serialization and Storage
 
-This is a software library and file format to serialize C# objects to a binary file or data stream. It is designed for compact storage without the performance overhead of compression.
+This is a software library and file format to serialize C# objects to a binary file or data stream. It is designed for fast and compact storage while keeping the flexibility of allowing changes in the model being serialized/deserialized. To allow this flexibility, the data must be serialized along with the names and types of the model members and deserialized with a little resilience towards missing members and type changes.
 
 ## File format
 In this notation we use the datatype indication `vlq` for a flexible number of bytes indicating a positive number (VLQ code) up to the size of an int (2,147,483,647). For more information see https://en.m.wikipedia.org/wiki/Variable-length_quantity
