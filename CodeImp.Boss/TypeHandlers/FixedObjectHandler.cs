@@ -179,7 +179,7 @@ namespace CodeImp.Boss.TypeHandlers
             }
             else
             {
-                return !datatype.IsAssignableTo(membertype);
+                return !membertype.IsAssignableFrom(datatype);
             }
         }
 	}
