@@ -22,7 +22,7 @@
             MemoryStream stream = new MemoryStream();
             BossSerializer.Serialize(obj, stream);
 
-            AssertStreamIsEqualTo(stream, "0C-00-00-00-00-00-00-00-0F-01-01-00-01-04-44-79-6E-61");
+            AssertStreamIsEqualTo(stream, "0A-00-00-00-00-00-00-00-0F-00-00");
 
             stream.Seek(0, SeekOrigin.Begin);
             ObjWithInterfaceProperty? result = BossSerializer.Deserialize<ObjWithInterfaceProperty>(stream);
@@ -68,7 +68,7 @@
             MemoryStream stream = new MemoryStream();
             BossSerializer.Serialize(obj, stream);
 
-            AssertStreamIsEqualTo(stream, "0C-00-00-00-00-00-00-00-0F-01-01-00-01-04-44-79-6E-61");
+            AssertStreamIsEqualTo(stream, "0A-00-00-00-00-00-00-00-0F-00-00");
 
             stream.Seek(0, SeekOrigin.Begin);
             ObjWithDerivedClassProperty? result = BossSerializer.Deserialize<ObjWithDerivedClassProperty>(stream);

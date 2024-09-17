@@ -67,7 +67,8 @@ namespace CodeImp.Boss.Tests.Performance
 		public int[] Neighbours { get; set; } = new int[10];
 		public List<int> Visibility { get; set; } = new List<int>();
 		public List<TestData> Data { get; set; } = new List<TestData>();
-		[BossDynamic]
+
+		[BossSerializable(Polymorphic = true)]
 		public List<TestData> DynamicData { get; set; } = new List<TestData>();
 
 		public void Fill()

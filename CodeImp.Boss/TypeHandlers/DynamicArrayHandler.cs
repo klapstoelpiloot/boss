@@ -19,7 +19,7 @@ namespace CodeImp.Boss.TypeHandlers
 			IEnumerable enumerable = value as IEnumerable;
 			foreach(object? e in enumerable)
 			{
-				serializer.Serialize(e, elementtype, writer);
+				serializer.Serialize(e, elementtype, writer, false);
 			}
 		}
 

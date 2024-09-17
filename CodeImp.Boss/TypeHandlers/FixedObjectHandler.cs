@@ -9,34 +9,87 @@ namespace CodeImp.Boss.TypeHandlers
 {
 	public class FixedObjectHandler : BossTypeHandler
 	{
+		private struct MemberValueInfo
+		{
+			public string Name;
+			public Type Type;
+			public object? Value;
+			public bool ForceDynamic;
+		};
+
 		public override byte BossType => (byte)BossTypeCode.FixedObject;
 		public override Type? ClassType => null;
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{
-			List<MemberInfo> members = serializer.GetSerializableMembers(value.GetType());
-			writer.WriteVLQ(members.Count);
+			Type valuetype = value.GetType();
+			object defaultvalue = Activator.CreateInstance(valuetype);
+			List<MemberInfo> members = serializer.GetSerializableMembers(valuetype);
+			List<MemberValueInfo> finalmembers = new List<MemberValueInfo>();
+
+			// Get member objects and determine if it we want to serialize this member
 			foreach(MemberInfo m in members)
 			{
-				Type membertype;
-				object? membervalue;
+				MemberValueInfo valueinfo;
+				valueinfo.Name = m.Name;
+
+				BossSerializableAttribute sa = m.GetCustomAttribute<BossSerializableAttribute>() ?? BossSerializableAttribute.Default;
+				valueinfo.ForceDynamic = sa.Polymorphic;
+
 				if(m is FieldInfo f)
 				{
-					membertype = f.FieldType;
-					membervalue = f.GetValue(value);
+					valueinfo.Type = f.FieldType;
+					valueinfo.Value = f.GetValue(value);
+
+					// Check if this member has its default value and we should skip it
+					if(sa.DefaultValueBehavior == DefaultValueBehavior.Default)
+					{
+						if(valueinfo.Type.IsValueType)
+						{
+							if(Equals(valueinfo.Value, f.GetValue(defaultvalue)))
+								continue;
+						}
+						else
+						{
+							if((valueinfo.Value is null) && (f.GetValue(defaultvalue) is null))
+								continue;
+						}
+					}
 				}
 				else if(m is PropertyInfo p)
 				{
-					membertype = p.PropertyType;
-					membervalue = p.GetValue(value);
+					valueinfo.Type = p.PropertyType;
+					valueinfo.Value = p.GetValue(value);
+
+					// Check if this member has its default value and we should skip it
+					if(sa.DefaultValueBehavior == DefaultValueBehavior.Default)
+					{
+						if(valueinfo.Type.IsValueType)
+						{
+							if(Equals(valueinfo.Value, p.GetValue(defaultvalue)))
+								continue;
+						}
+						else
+						{
+							if((valueinfo.Value is null) && (p.GetValue(defaultvalue) is null))
+								continue;
+						}
+					}
 				}
 				else
 				{
 					throw new NotImplementedException();
 				}
 
+				finalmembers.Add(valueinfo);
+			}
+
+			// Serialize
+			writer.WriteVLQ(finalmembers.Count);
+			foreach(MemberValueInfo m in finalmembers)
+			{
 				writer.Write(m.Name);
-				serializer.Serialize(membervalue, membertype, writer);
+				serializer.Serialize(m.Value, m.Type, writer, m.ForceDynamic);
 			}
 		}
 
