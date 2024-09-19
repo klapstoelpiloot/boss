@@ -106,6 +106,16 @@ namespace CodeImp.Boss
             stream.Flush();
         }
 
+		/// <summary>
+		/// Serializes the given object with Deflate compression.
+        /// </summary>
+        public static byte[] SerializeCompressed<T>(T obj)
+        {
+			using MemoryStream stream = new MemoryStream();
+			SerializeCompressed(obj, stream);
+			return stream.ToArray();
+        }
+
         /// <summary>
         /// Deserializes an object from the specified stream.
 		/// This does not close or dispose the stream.
@@ -137,6 +147,15 @@ namespace CodeImp.Boss
             zipstream.CopyTo(memstream);
             memstream.Seek(0, SeekOrigin.Begin);
             return Deserialize<T>(memstream);
+        }
+
+        /// <summary>
+        /// Deserializes an object from the specified compressed data bytes.
+        /// </summary>
+        public static T? DeserializeCompressed<T>(byte[] data)
+        {
+            using MemoryStream stream = new MemoryStream(data);
+            return DeserializeCompressed<T>(stream);
         }
 
 

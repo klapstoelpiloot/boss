@@ -45,5 +45,20 @@ namespace CodeImp.Boss.Tests
             Assert.That(result.number, Is.EqualTo(obj.number));
             Assert.That(result.smallnumber, Is.EqualTo(obj.smallnumber));
         }
+
+        [Test]
+        public void RoundtripCompressedBytes()
+        {
+            ObjWithAllFields obj = new ObjWithAllFields();
+
+            byte[] bytes = BossSerializer.SerializeCompressed(obj);
+            ObjWithAllFields? result = BossSerializer.DeserializeCompressed<ObjWithAllFields>(bytes);
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<ObjWithAllFields>());
+            Assert.That(result.name, Is.EqualTo(obj.name));
+            Assert.That(result.number, Is.EqualTo(obj.number));
+            Assert.That(result.smallnumber, Is.EqualTo(obj.smallnumber));
+        }
     }
 }
