@@ -120,17 +120,20 @@ namespace CodeImp.Boss.TypeHandlers
                         }
                         else
                         {
-                            Type resulttype = result.GetType();
-                            if(IsConversionNeeded(resulttype, fieldinfo.FieldType))
+                            if(fieldinfo.FieldType.IsEnum && (result is string resultstr))
+                                fieldinfo.SetValue(obj, Enum.Parse(fieldinfo.FieldType, resultstr));
+                            else if(fieldinfo.FieldType.IsEnum)
+                                fieldinfo.SetValue(obj, Enum.ToObject(fieldinfo.FieldType, result));
+                            else if(IsConversionNeeded(result.GetType(), fieldinfo.FieldType))
                                 fieldinfo.SetValue(obj, Convert.ChangeType(result, fieldinfo.FieldType));
                             else
 					            fieldinfo.SetValue(obj, result);
                         }
                     }
-                    catch(Exception)
+                    catch(Exception ex)
                     {
-                        // Maybe we want to implement some public event in BossSerialize that is raised for this exception?
-                        // Just to notify the user and the user can choose how to response to this exception.
+                        if(serializer.ThrowOnDeserializationFailure)
+                            throw new BossSerializationException($"Unable to deserialize member '{membername}' of '{objtype.Name}'.", ex);
                     }
 				}
 				else if(memberinfo is PropertyInfo propinfo)
@@ -145,17 +148,20 @@ namespace CodeImp.Boss.TypeHandlers
                         }
                         else
                         {
-                            Type resulttype = result.GetType();
-                            if(IsConversionNeeded(resulttype, propinfo.PropertyType))
+                            if(propinfo.PropertyType.IsEnum && (result is string resultstr))
+                                propinfo.SetValue(obj, Enum.Parse(propinfo.PropertyType, resultstr));
+                            else if(propinfo.PropertyType.IsEnum)
+                                propinfo.SetValue(obj, Enum.ToObject(propinfo.PropertyType, result));
+                            else if(IsConversionNeeded(result.GetType(), propinfo.PropertyType))
                                 propinfo.SetValue(obj, Convert.ChangeType(result, propinfo.PropertyType));
                             else
                                 propinfo.SetValue(obj, result);
                         }
                     }
-                    catch(Exception)
+                    catch(Exception ex)
                     {
-                        // Maybe we want to implement some public event in BossSerialize that is raised for this exception?
-                        // Just to notify the user and the user can choose how to response to this exception.
+                        if(serializer.ThrowOnDeserializationFailure)
+                            throw new BossSerializationException($"Unable to deserialize member '{membername}' of '{objtype.Name}'.", ex);
                     }
 				}
 				else

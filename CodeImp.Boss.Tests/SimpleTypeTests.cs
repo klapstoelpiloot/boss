@@ -161,6 +161,69 @@ namespace CodeImp.Boss.Tests
             Assert.That(result.firstname, Is.EqualTo(obj.firstname));
             Assert.That(result.samevalue, Is.EqualTo(obj.samevalue));
         }
+
+        public enum Forces
+        {
+            None = 0,
+            Gravity = 1,
+            Electromagnetism = 2,
+            Weak = 3,
+            Strong = 4
+        };
+
+        [BossEnumOptions(Method = EnumSerializationMethod.Names)]
+        public enum ForcesByName
+        {
+            None = 0,
+            Gravity = 1,
+            Electromagnetism = 2,
+            Weak = 3,
+            Strong = 4
+        };
+
+        public class ObjWithEnum
+        {
+            public Forces Force { get; set; } = Forces.Gravity;
+        }
+
+        [Test]
+        public void ObjectWithEnumProperty()
+        {
+            ObjWithEnum obj = new ObjWithEnum();
+            obj.Force = Forces.Electromagnetism;
+            MemoryStream stream = new MemoryStream();
+            BossSerializer.Serialize(obj, stream);
+
+            AssertStreamIsEqualTo(stream, "10-00-00-00-00-00-00-00-0F-01-01-06-02-00-00-00-01-05-46-6F-72-63-65");
+
+            stream.Seek(0, SeekOrigin.Begin);
+            ObjWithEnum? result = BossSerializer.Deserialize<ObjWithEnum>(stream);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<ObjWithEnum>());
+            Assert.That(result.Force, Is.EqualTo(obj.Force));
+        }
+
+        public class ObjWithNamedEnum
+        {
+            public ForcesByName Force { get; set; } = ForcesByName.Gravity;
+        }
+
+        [Test]
+        public void ObjectWithNamedEnumProperty()
+        {
+            ObjWithNamedEnum obj = new ObjWithNamedEnum();
+            obj.Force = ForcesByName.Electromagnetism;
+            MemoryStream stream = new MemoryStream();
+            BossSerializer.Serialize(obj, stream);
+
+            AssertStreamIsEqualTo(stream, "0D-00-00-00-00-00-00-00-0F-01-01-0C-02-02-05-46-6F-72-63-65-10-45-6C-65-63-74-72-6F-6D-61-67-6E-65-74-69-73-6D");
+
+            stream.Seek(0, SeekOrigin.Begin);
+            ObjWithNamedEnum? result = BossSerializer.Deserialize<ObjWithNamedEnum>(stream);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<ObjWithNamedEnum>());
+            Assert.That(result.Force, Is.EqualTo(obj.Force));
+        }
     }
 }
 

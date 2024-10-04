@@ -9,7 +9,7 @@ namespace CodeImp.Boss.TypeHandlers
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{
-			writer.Write((string?)value);
+			writer.Write(value?.ToString());
 		}
 
 		public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
