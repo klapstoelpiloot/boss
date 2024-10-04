@@ -19,7 +19,7 @@ namespace CodeImp.Boss.TypeHandlers
 			IEnumerable enumerable = value as IEnumerable;
 			foreach(object? e in enumerable)
 			{
-				serializer.Serialize(e, elementtype, writer, false);
+				serializer.SerializeInternal(e, elementtype, writer, false);
 			}
 		}
 
@@ -31,7 +31,7 @@ namespace CodeImp.Boss.TypeHandlers
 			object?[] list = new object?[elementcount];
 			for(int i = 0; i < elementcount; i++)
 			{
-				list[i] = serializer.Deserialize(reader, elementtype);
+				list[i] = serializer.DeserializeInternal(reader, elementtype);
 			}
 
 			if(basetype.IsArray)

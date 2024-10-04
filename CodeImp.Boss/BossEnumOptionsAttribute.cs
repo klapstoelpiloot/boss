@@ -7,12 +7,12 @@ namespace CodeImp.Boss
         /// <summary>
         /// Serialzie the enum values as the underlying type of the enum.
         /// </summary>
-        Values = 0,
+        MemberValues = 0,
 
         /// <summary>
-        /// Serialize the enum name as a string.
+        /// Serialize the enum member names as a string.
         /// </summary>
-        Names = 1
+        MemberNames = 1
     };
 
 	/// <summary>
@@ -26,6 +26,6 @@ namespace CodeImp.Boss
 		/// <summary>
 		/// Controls how values are serialized.
 		/// </summary>
-		public EnumSerializationMethod Method { get; set; } = EnumSerializationMethod.Values;
+		public EnumSerializationMethod Method { get; set; } = EnumSerializationMethod.MemberValues;
     }
 }

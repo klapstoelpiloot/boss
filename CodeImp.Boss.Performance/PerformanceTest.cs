@@ -166,7 +166,7 @@ namespace CodeImp.Boss.Tests.Performance
 
 			using MemoryStream stream = new MemoryStream(1000000);
 			TestPile tp = MakePile();
-			BossSerializer.Serialize(tp, stream);
+			BossConvert.ToStream(tp, stream, true);
 			return stream;
 		}
 
@@ -190,11 +190,11 @@ namespace CodeImp.Boss.Tests.Performance
 			{
 				// Write to stream
 				stream.Seek(0, SeekOrigin.Begin);
-				BossSerializer.Serialize(tp, stream);
+				BossConvert.ToStream(tp, stream);
 
 				// Read from stream
 				stream.Seek(0, SeekOrigin.Begin);
-				BossSerializer.Deserialize<TestPile>(stream);
+				BossConvert.FromStream<TestPile>(stream);
 			}
 
 			stopwatch.Stop();

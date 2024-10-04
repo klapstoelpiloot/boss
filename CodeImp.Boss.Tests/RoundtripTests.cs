@@ -21,9 +21,9 @@ namespace CodeImp.Boss.Tests
         {
             ObjWithAllFields obj = new ObjWithAllFields();
             MemoryStream stream = new MemoryStream();
-            BossSerializer.Serialize(obj, stream);
+            BossConvert.ToStream(obj, stream);
             stream.Seek(0, SeekOrigin.Begin);
-            ObjWithAllFields? result = BossSerializer.Deserialize<ObjWithAllFields>(stream);
+            ObjWithAllFields? result = BossConvert.FromStream<ObjWithAllFields>(stream);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<ObjWithAllFields>());
             Assert.That(result.name, Is.EqualTo(obj.name));
@@ -36,9 +36,9 @@ namespace CodeImp.Boss.Tests
         {
             ObjWithAllFields obj = new ObjWithAllFields();
             MemoryStream stream = new MemoryStream();
-            BossSerializer.SerializeCompressed(obj, stream);
+            BossConvert.ToStream(obj, stream, true);
             stream.Seek(0, SeekOrigin.Begin);
-            ObjWithAllFields? result = BossSerializer.DeserializeCompressed<ObjWithAllFields>(stream);
+            ObjWithAllFields? result = BossConvert.FromStream<ObjWithAllFields>(stream, true);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<ObjWithAllFields>());
             Assert.That(result.name, Is.EqualTo(obj.name));
@@ -51,8 +51,8 @@ namespace CodeImp.Boss.Tests
         {
             ObjWithAllFields obj = new ObjWithAllFields();
 
-            byte[] bytes = BossSerializer.SerializeCompressed(obj);
-            ObjWithAllFields? result = BossSerializer.DeserializeCompressed<ObjWithAllFields>(bytes);
+            byte[] bytes = BossConvert.ToBytes(obj, true);
+            ObjWithAllFields? result = BossConvert.FromBytes<ObjWithAllFields>(bytes, true);
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<ObjWithAllFields>());

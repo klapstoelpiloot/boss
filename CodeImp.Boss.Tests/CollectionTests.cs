@@ -32,12 +32,12 @@ namespace CodeImp.Boss.Tests
 			ObjWithPrimitiveArray<T> obj = new ObjWithPrimitiveArray<T>();
 			obj.Numbers = values;
 			MemoryStream stream = new MemoryStream();
-			BossSerializer.Serialize(obj, stream);
+			BossConvert.ToStream(obj, stream);
 
 			AssertStreamIsEqualTo(stream, expecteddata);
 
 			stream.Position = 0;
-			ObjWithPrimitiveArray<T>? result = BossSerializer.Deserialize<ObjWithPrimitiveArray<T>>(stream);
+			ObjWithPrimitiveArray<T>? result = BossConvert.FromStream<ObjWithPrimitiveArray<T>>(stream);
 			Assert.That(result, Is.Not.Null);
 			Assert.That(result, Is.InstanceOf<ObjWithPrimitiveArray<T>>());
 			Assert.That(result.Numbers, Is.EqualTo(obj.Numbers));
@@ -54,12 +54,12 @@ namespace CodeImp.Boss.Tests
 			ObjWithList obj = new ObjWithList();
 			obj.Numbers = [3, 2, 1];
 			MemoryStream stream = new MemoryStream();
-			BossSerializer.Serialize(obj, stream);
+			BossConvert.ToStream(obj, stream);
 
 			AssertStreamIsEqualTo(stream, "1A-00-00-00-00-00-00-00-0F-01-01-0D-03-06-03-00-00-00-02-00-00-00-01-00-00-00-01-07-4E-75-6D-62-65-72-73");
 
 			stream.Position = 0;
-			ObjWithList? result = BossSerializer.Deserialize<ObjWithList>(stream);
+			ObjWithList? result = BossConvert.FromStream<ObjWithList>(stream);
 			Assert.That(result, Is.Not.Null);
 			Assert.That(result, Is.InstanceOf<ObjWithList>());
 			Assert.That(result.Numbers, Is.EqualTo(obj.Numbers));
@@ -78,12 +78,12 @@ namespace CodeImp.Boss.Tests
             obj.Enums = [Forces.Electromagnetism, Forces.Weak, Forces.Gravity];
             obj.EnumNames = [ForcesByName.Electromagnetism, ForcesByName.Weak, ForcesByName.Gravity];
 			MemoryStream stream = new MemoryStream();
-			BossSerializer.Serialize(obj, stream);
+			BossConvert.ToStream(obj, stream);
 
 			AssertStreamIsEqualTo(stream, "21-00-00-00-00-00-00-00-0F-02-01-0D-03-06-02-00-00-00-03-00-00-00-01-00-00-00-02-0D-03-0C-03-04-05-05-05-45-6E-75-6D-73-09-45-6E-75-6D-4E-61-6D-65-73-10-45-6C-65-63-74-72-6F-6D-61-67-6E-65-74-69-73-6D-04-57-65-61-6B-07-47-72-61-76-69-74-79");
 
 			stream.Position = 0;
-			ObjWithEnums? result = BossSerializer.Deserialize<ObjWithEnums>(stream);
+			ObjWithEnums? result = BossConvert.FromStream<ObjWithEnums>(stream);
 			Assert.That(result, Is.Not.Null);
 			Assert.That(result, Is.InstanceOf<ObjWithEnums>());
 			Assert.That(result.Enums, Is.EqualTo(obj.Enums));
@@ -104,12 +104,12 @@ namespace CodeImp.Boss.Tests
 			obj.Numbers.Enqueue(2);
 			obj.Numbers.Enqueue(1);
 			MemoryStream stream = new MemoryStream();
-			BossSerializer.Serialize(obj, stream);
+			BossConvert.ToStream(obj, stream);
 
 			AssertStreamIsEqualTo(stream, "1A-00-00-00-00-00-00-00-0F-01-01-0D-03-06-03-00-00-00-02-00-00-00-01-00-00-00-01-07-4E-75-6D-62-65-72-73");
 
 			stream.Position = 0;
-			ObjWithQueue? result = BossSerializer.Deserialize<ObjWithQueue>(stream);
+			ObjWithQueue? result = BossConvert.FromStream<ObjWithQueue>(stream);
 			Assert.That(result, Is.Not.Null);
 			Assert.That(result, Is.InstanceOf<ObjWithQueue>());
 			Assert.That(result.Numbers, Is.EqualTo(obj.Numbers));
@@ -126,12 +126,12 @@ namespace CodeImp.Boss.Tests
 			ObjWithStructArray obj = new ObjWithStructArray();
 			obj.Points = [new Point(1, 2), new Point(3, 4), new Point(5, 6)];
 			MemoryStream stream = new MemoryStream();
-			BossSerializer.Serialize(obj, stream);
+			BossConvert.ToStream(obj, stream);
 
 			AssertStreamIsEqualTo(stream, "35-00-00-00-00-00-00-00-0F-01-01-0D-03-0F-02-02-06-01-00-00-00-03-06-02-00-00-00-02-02-06-03-00-00-00-03-06-04-00-00-00-02-02-06-05-00-00-00-03-06-06-00-00-00-03-06-50-6F-69-6E-74-73-01-58-01-59");
 
 			stream.Position = 0;
-			ObjWithStructArray? result = BossSerializer.Deserialize<ObjWithStructArray>(stream);
+			ObjWithStructArray? result = BossConvert.FromStream<ObjWithStructArray>(stream);
 			Assert.That(result, Is.Not.Null);
 			Assert.That(result, Is.InstanceOf<ObjWithStructArray>());
 			Assert.That(result.Points, Is.EqualTo(obj.Points));
@@ -148,12 +148,12 @@ namespace CodeImp.Boss.Tests
 			ObjWithStructList obj = new ObjWithStructList();
 			obj.Points = [new Point(1, 2), new Point(3, 4), new Point(5, 6)];
 			MemoryStream stream = new MemoryStream();
-			BossSerializer.Serialize(obj, stream);
+			BossConvert.ToStream(obj, stream);
 
 			AssertStreamIsEqualTo(stream, "35-00-00-00-00-00-00-00-0F-01-01-0D-03-0F-02-02-06-01-00-00-00-03-06-02-00-00-00-02-02-06-03-00-00-00-03-06-04-00-00-00-02-02-06-05-00-00-00-03-06-06-00-00-00-03-06-50-6F-69-6E-74-73-01-58-01-59");
 
 			stream.Position = 0;
-			ObjWithStructList? result = BossSerializer.Deserialize<ObjWithStructList>(stream);
+			ObjWithStructList? result = BossConvert.FromStream<ObjWithStructList>(stream);
 			Assert.That(result, Is.Not.Null);
 			Assert.That(result, Is.InstanceOf<ObjWithStructList>());
 			Assert.That(result.Points, Is.EqualTo(obj.Points));
@@ -177,12 +177,12 @@ namespace CodeImp.Boss.Tests
 			ObjWithDynamicArray obj = new ObjWithDynamicArray();
 			obj.Objs = [new DerivedObject1(), null, new DerivedObject2() { Number = 69 }];
 			MemoryStream stream = new MemoryStream();
-			BossSerializer.Serialize(obj, stream);
+			BossConvert.ToStream(obj, stream);
 
 			AssertStreamIsEqualTo(stream, "1A-00-00-00-00-00-00-00-0F-01-01-0E-03-10-02-00-00-10-03-01-04-06-45-00-00-00-04-04-4F-62-6A-73-0E-44-65-72-69-76-65-64-4F-62-6A-65-63-74-31-0E-44-65-72-69-76-65-64-4F-62-6A-65-63-74-32-06-4E-75-6D-62-65-72");
 
 			stream.Position = 0;
-			ObjWithDynamicArray? result = BossSerializer.Deserialize<ObjWithDynamicArray>(stream);
+			ObjWithDynamicArray? result = BossConvert.FromStream<ObjWithDynamicArray>(stream);
 			Assert.That(result, Is.Not.Null);
 			Assert.That(result, Is.InstanceOf<ObjWithDynamicArray>());
 			Assert.That(result.Objs, Is.InstanceOf<SomeBaseObject[]>());
@@ -207,12 +207,12 @@ namespace CodeImp.Boss.Tests
 			ObjWithDynamicList obj = new ObjWithDynamicList();
 			obj.Objs = [new DerivedObject1(), null, new DerivedObject2() { Number = 69 }];
 			MemoryStream stream = new MemoryStream();
-			BossSerializer.Serialize(obj, stream);
+			BossConvert.ToStream(obj, stream);
 
 			AssertStreamIsEqualTo(stream, "1A-00-00-00-00-00-00-00-0F-01-01-0E-03-10-02-00-00-10-03-01-04-06-45-00-00-00-04-04-4F-62-6A-73-0E-44-65-72-69-76-65-64-4F-62-6A-65-63-74-31-0E-44-65-72-69-76-65-64-4F-62-6A-65-63-74-32-06-4E-75-6D-62-65-72");
 
 			stream.Position = 0;
-			ObjWithDynamicList? result = BossSerializer.Deserialize<ObjWithDynamicList>(stream);
+			ObjWithDynamicList? result = BossConvert.FromStream<ObjWithDynamicList>(stream);
 			Assert.That(result, Is.Not.Null);
 			Assert.That(result, Is.InstanceOf<ObjWithDynamicList>());
 			Assert.That(result.Objs, Is.InstanceOf<List<SomeBaseObject>>());

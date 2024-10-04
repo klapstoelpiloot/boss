@@ -65,12 +65,12 @@
             ObjWithVector3 obj = new ObjWithVector3();
             obj.Pos = new Vector3(1.0f, 2.0f, 3.0f);
             MemoryStream stream = new MemoryStream();
-            BossSerializer.Serialize(obj, stream);
+            BossConvert.ToStream(obj, stream);
 
             AssertStreamIsEqualTo(stream, "18-00-00-00-00-00-00-00-0F-01-01-40-00-00-80-3F-00-00-00-40-00-00-40-40-01-03-50-6F-73");
 
             stream.Seek(0, SeekOrigin.Begin);
-            ObjWithVector3? result = BossSerializer.Deserialize<ObjWithVector3>(stream);
+            ObjWithVector3? result = BossConvert.FromStream<ObjWithVector3>(stream);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<ObjWithVector3>());
             Assert.That(result.Pos, Is.InstanceOf<Vector3>());

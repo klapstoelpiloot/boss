@@ -21,7 +21,7 @@ namespace CodeImp.Boss
         private readonly Dictionary<Type, List<MemberInfo>> serializablememberscache = new Dictionary<Type, List<MemberInfo>>();
 
         // Serialization options
-        public bool ThrowOnDeserializationFailure { get; set; } = true;
+        public bool ThrowOnDeserializationFailure { get; set; } = false;
 
         // Static constructor
         static BossSerializer()
@@ -77,15 +77,14 @@ namespace CodeImp.Boss
         /// Serializes the given object to the specified stream.
         /// This does not close or dispose the stream.
         /// </summary>
-        public static void Serialize<T>(T obj, Stream stream)
+        public void Serialize<T>(T obj, Stream stream)
         {
             handlerslock.AcquireReaderLock(TimeSpan.FromSeconds(1));
             try
             {
-                BossSerializer serializer = new BossSerializer();
                 using BossWriter writer = new BossWriter(stream);
                 writer.BeginWriting();
-                serializer.Serialize(obj, typeof(T), writer, false);
+                SerializeInternal(obj, typeof(T), writer, false);
                 writer.EndWriting();
             }
             finally
@@ -95,90 +94,23 @@ namespace CodeImp.Boss
         }
 
         /// <summary>
-        /// Serializes the given object to the specified stream with Deflate compression.
-        /// This does not close or dispose the stream.
-        /// </summary>
-        public static void SerializeCompressed<T>(T obj, Stream stream)
-        {
-            using MemoryStream memstream = new MemoryStream();
-            Serialize(obj, memstream);
-            using DeflateStream zipstream = new DeflateStream(stream, CompressionMode.Compress, true);
-            memstream.WriteTo(zipstream);
-            zipstream.Flush();
-            stream.Flush();
-        }
-
-        /// <summary>
-        /// Serializes the given object with Deflate compression.
-        /// </summary>
-        public static byte[] SerializeCompressed<T>(T obj)
-        {
-            using MemoryStream stream = new MemoryStream();
-            SerializeCompressed(obj, stream);
-            return stream.ToArray();
-        }
-
-        /// <summary>
         /// Deserializes an object from the specified stream.
 		/// This does not close or dispose the stream.
 		/// </summary>
-		public T? DeserializeI<T>(Stream stream)
+		public T? Deserialize<T>(Stream stream)
         {
             handlerslock.AcquireReaderLock(TimeSpan.FromSeconds(1));
             try
             {
                 using BossReader reader = new BossReader(stream);
                 reader.BeginReading();
-                return (T?)Deserialize(reader, typeof(T));
+                return (T?)DeserializeInternal(reader, typeof(T));
             }
             finally
             {
                 handlerslock.ReleaseReaderLock();
             }
         }
-
-        /// <summary>
-        /// Deserializes an object from the specified stream.
-		/// This does not close or dispose the stream.
-		/// </summary>
-		public static T? Deserialize<T>(Stream stream)
-        {
-            handlerslock.AcquireReaderLock(TimeSpan.FromSeconds(1));
-            try
-            {
-                BossSerializer serializer = new BossSerializer();
-                using BossReader reader = new BossReader(stream);
-                reader.BeginReading();
-                return (T?)serializer.Deserialize(reader, typeof(T));
-            }
-            finally
-            {
-                handlerslock.ReleaseReaderLock();
-            }
-        }
-
-        /// <summary>
-        /// Deserializes an object from the specified compressed stream.
-        /// This does not close or dispose the stream.
-        /// </summary>
-        public static T? DeserializeCompressed<T>(Stream stream)
-        {
-            using MemoryStream memstream = new MemoryStream();
-            using DeflateStream zipstream = new DeflateStream(stream, CompressionMode.Decompress, true);
-            zipstream.CopyTo(memstream);
-            memstream.Seek(0, SeekOrigin.Begin);
-            return Deserialize<T>(memstream);
-        }
-
-        /// <summary>
-        /// Deserializes an object from the specified compressed data bytes.
-        /// </summary>
-        public static T? DeserializeCompressed<T>(byte[] data)
-        {
-            using MemoryStream stream = new MemoryStream(data);
-            return DeserializeCompressed<T>(stream);
-        }
-
 
         // Returns the handler for the specified Boss type code
         internal BossTypeHandler GetTypeHandler(BossTypeCode typecode)
@@ -238,11 +170,11 @@ namespace CodeImp.Boss
                 BossEnumOptionsAttribute ea = membertype.GetCustomAttribute<BossEnumOptionsAttribute>() ?? BossEnumOptionsAttribute.Default;
                 switch (ea.Method)
                 {
-                    case EnumSerializationMethod.Values:
+                    case EnumSerializationMethod.MemberValues:
                         Type realtype = membertype.GetEnumUnderlyingType();
                         return handlersbyclasstype[realtype];
 
-                    case EnumSerializationMethod.Names:
+                    case EnumSerializationMethod.MemberNames:
                         return handlersbyclasstype[typeof(string)];
 
                     default:
@@ -264,14 +196,14 @@ namespace CodeImp.Boss
         }
 
         // Serializes the given object
-        internal void Serialize(object? obj, Type type, BossWriter writer, bool forcedynamic)
+        internal void SerializeInternal(object? obj, Type type, BossWriter writer, bool forcedynamic)
         {
             BossTypeHandler? handler = SelectTypeHandler(type, obj?.GetType() ?? null, forcedynamic);
             SerializeWithHandler(obj, handler, writer);
         }
 
         // Deserializes an object
-        internal object? Deserialize(BossReader reader, Type basetype)
+        internal object? DeserializeInternal(BossReader reader, Type basetype)
         {
             byte typecode = reader.ReadByte();
             BossTypeHandler handler = typehandlers[typecode];
@@ -318,7 +250,7 @@ namespace CodeImp.Boss
             return null;
         }
 
-        public static Type GetCollectionElementType(Type type)
+        internal static Type GetCollectionElementType(Type type)
         {
             if (type.IsArray)
             {
@@ -339,7 +271,7 @@ namespace CodeImp.Boss
             }
         }
 
-        public static int GetCollectionElementCount(Type type, object collection)
+        internal static int GetCollectionElementCount(Type type, object collection)
         {
             if (type.IsArray)
             {
@@ -365,7 +297,7 @@ namespace CodeImp.Boss
         }
 
         // Helper method to get all serializable members from the specified type.
-        public List<MemberInfo> GetSerializableMembers(Type type)
+        internal List<MemberInfo> GetSerializableMembers(Type type)
         {
             if (!serializablememberscache.TryGetValue(type, out List<MemberInfo> members))
             {

@@ -89,7 +89,7 @@ namespace CodeImp.Boss.TypeHandlers
 			foreach(MemberValueInfo m in finalmembers)
 			{
 				writer.Write(m.Name);
-				serializer.Serialize(m.Value, m.Type, writer, m.ForceDynamic);
+				serializer.SerializeInternal(m.Value, m.Type, writer, m.ForceDynamic);
 			}
 		}
 
@@ -106,12 +106,12 @@ namespace CodeImp.Boss.TypeHandlers
 				if(memberinfo == null)
 				{
 					// To continue deserializing, we MUST call deserialize to skip this data.
-					serializer.Deserialize(reader, typeof(object));
+					serializer.DeserializeInternal(reader, typeof(object));
 				}
 				else if(memberinfo is FieldInfo fieldinfo)
 				{
                     // Member is a field
-					object? result = serializer.Deserialize(reader, fieldinfo.FieldType);
+					object? result = serializer.DeserializeInternal(reader, fieldinfo.FieldType);
                     try
                     {
                         if(result == null)
@@ -135,7 +135,7 @@ namespace CodeImp.Boss.TypeHandlers
 				else if(memberinfo is PropertyInfo propinfo)
 				{
                     // Member is a property
-					object? result = serializer.Deserialize(reader, propinfo.PropertyType);
+					object? result = serializer.DeserializeInternal(reader, propinfo.PropertyType);
                     try
                     {
                         if(result == null)

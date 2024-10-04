@@ -14,8 +14,16 @@ test.RunJsonBatches(REPEATS);
 void OutputFiles()
 {
 	MemoryStream stream = test.SingleRunBoss();
-	File.WriteAllBytes(Path.Combine(path, "Serialized.boss"), stream.ToArray());
+    string bossfile = Path.Combine(path, "Serialized.boss");
+	File.WriteAllBytes(bossfile, stream.ToArray());
 
 	string json = test.SingleRunJson();
-	File.WriteAllText(Path.Combine(path, "Serialized.json"), json);
+    string jsonfile = Path.Combine(path, "Serialized.json");
+	File.WriteAllText(jsonfile, json);
+
+    FileInfo bossinfo = new FileInfo(bossfile);
+    FileInfo jsoninfo = new FileInfo(jsonfile);
+    
+    float ratio = ((float)bossinfo.Length / (float)jsoninfo.Length) * 100.0f;
+    Console.WriteLine($"Boss file size is {ratio:0.00}% compared to Json.");
 }

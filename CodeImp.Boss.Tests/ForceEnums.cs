@@ -9,7 +9,7 @@
         Strong = 4
     };
 
-    [BossEnumOptions(Method = EnumSerializationMethod.Names)]
+    [BossEnumOptions(Method = EnumSerializationMethod.MemberNames)]
     public enum ForcesByName
     {
         None = 0,

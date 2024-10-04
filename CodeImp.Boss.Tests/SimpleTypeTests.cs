@@ -23,12 +23,12 @@ namespace CodeImp.Boss.Tests
         private void TestPrimtiveType<T>(T value, string expecteddata)
         {
             MemoryStream stream = new MemoryStream();
-            BossSerializer.Serialize<T>(value, stream);
+            BossConvert.ToStream<T>(value, stream);
 
             AssertStreamIsEqualTo(stream, expecteddata);
 
             stream.Position = 0;
-            T result = BossSerializer.Deserialize<T>(stream);
+            T result = BossConvert.FromStream<T>(stream);
             Assert.That(result, Is.EqualTo(value));
         }
 
@@ -43,12 +43,12 @@ namespace CodeImp.Boss.Tests
             ObjWithInt obj = new ObjWithInt();
             obj.Age = 18;
             MemoryStream stream = new MemoryStream();
-            BossSerializer.Serialize(obj, stream);
+            BossConvert.ToStream(obj, stream);
 
             AssertStreamIsEqualTo(stream, "10-00-00-00-00-00-00-00-0F-01-01-06-12-00-00-00-01-03-41-67-65");
 
             stream.Seek(0, SeekOrigin.Begin);
-            ObjWithInt? result = BossSerializer.Deserialize<ObjWithInt>(stream);
+            ObjWithInt? result = BossConvert.FromStream<ObjWithInt>(stream);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<ObjWithInt>());
             Assert.That(result.Age, Is.EqualTo(obj.Age));
@@ -65,12 +65,12 @@ namespace CodeImp.Boss.Tests
             ObjWithClassObj obj = new ObjWithClassObj();
 			obj.ClassObj = null;
             MemoryStream stream = new MemoryStream();
-            BossSerializer.Serialize(obj, stream);
+            BossConvert.ToStream(obj, stream);
 
             AssertStreamIsEqualTo(stream, "0C-00-00-00-00-00-00-00-0F-01-01-00-01-08-43-6C-61-73-73-4F-62-6A");
 
             stream.Seek(0, SeekOrigin.Begin);
-            ObjWithClassObj? result = BossSerializer.Deserialize<ObjWithClassObj>(stream);
+            ObjWithClassObj? result = BossConvert.FromStream<ObjWithClassObj>(stream);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<ObjWithClassObj>());
             Assert.That(result.ClassObj, Is.Null);
@@ -86,12 +86,12 @@ namespace CodeImp.Boss.Tests
         {
             ObjWithClassObjDefaultNull obj = new ObjWithClassObjDefaultNull();
             MemoryStream stream = new MemoryStream();
-            BossSerializer.Serialize(obj, stream);
+            BossConvert.ToStream(obj, stream);
 
             AssertStreamIsEqualTo(stream, "0A-00-00-00-00-00-00-00-0F-00-00");
 
             stream.Seek(0, SeekOrigin.Begin);
-            ObjWithClassObjDefaultNull? result = BossSerializer.Deserialize<ObjWithClassObjDefaultNull>(stream);
+            ObjWithClassObjDefaultNull? result = BossConvert.FromStream<ObjWithClassObjDefaultNull>(stream);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<ObjWithClassObjDefaultNull>());
             Assert.That(result.ClassObj, Is.Null);
@@ -108,12 +108,12 @@ namespace CodeImp.Boss.Tests
         {
             ObjWithClassObjDefaultNullInclude obj = new ObjWithClassObjDefaultNullInclude();
             MemoryStream stream = new MemoryStream();
-            BossSerializer.Serialize(obj, stream);
+            BossConvert.ToStream(obj, stream);
 
             AssertStreamIsEqualTo(stream, "0C-00-00-00-00-00-00-00-0F-01-01-00-01-08-43-6C-61-73-73-4F-62-6A");
 
             stream.Seek(0, SeekOrigin.Begin);
-            ObjWithClassObjDefaultNullInclude? result = BossSerializer.Deserialize<ObjWithClassObjDefaultNullInclude>(stream);
+            ObjWithClassObjDefaultNullInclude? result = BossConvert.FromStream<ObjWithClassObjDefaultNullInclude>(stream);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<ObjWithClassObjDefaultNullInclude>());
             Assert.That(result.ClassObj, Is.Null);
@@ -126,12 +126,12 @@ namespace CodeImp.Boss.Tests
             obj.ClassObj = new ObjWithInt();
             obj.ClassObj.Age = 42;
             MemoryStream stream = new MemoryStream();
-            BossSerializer.Serialize(obj, stream);
+            BossConvert.ToStream(obj, stream);
 
             AssertStreamIsEqualTo(stream, "13-00-00-00-00-00-00-00-0F-01-01-0F-01-02-06-2A-00-00-00-02-08-43-6C-61-73-73-4F-62-6A-03-41-67-65");
 
             stream.Seek(0, SeekOrigin.Begin);
-            ObjWithClassObj? result = BossSerializer.Deserialize<ObjWithClassObj>(stream);
+            ObjWithClassObj? result = BossConvert.FromStream<ObjWithClassObj>(stream);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<ObjWithClassObj>());
             Assert.That(result.ClassObj, Is.Not.Null);
@@ -152,12 +152,12 @@ namespace CodeImp.Boss.Tests
             obj.firstname = "Freddy";
             obj.samevalue = "Freddy";
             MemoryStream stream = new MemoryStream();
-            BossSerializer.Serialize(obj, stream);
+            BossConvert.ToStream(obj, stream);
 
             AssertStreamIsEqualTo(stream, "10-00-00-00-00-00-00-00-0F-02-01-0C-02-03-0C-02-03-09-66-69-72-73-74-6E-61-6D-65-06-46-72-65-64-64-79-09-73-61-6D-65-76-61-6C-75-65");
 
             stream.Seek(0, SeekOrigin.Begin);
-            ObjWithFields? result = BossSerializer.Deserialize<ObjWithFields>(stream);
+            ObjWithFields? result = BossConvert.FromStream<ObjWithFields>(stream);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<ObjWithFields>());
             Assert.That(result.firstname, Is.EqualTo(obj.firstname));
@@ -175,12 +175,12 @@ namespace CodeImp.Boss.Tests
             ObjWithEnum obj = new ObjWithEnum();
             obj.Force = Forces.Electromagnetism;
             MemoryStream stream = new MemoryStream();
-            BossSerializer.Serialize(obj, stream);
+            BossConvert.ToStream(obj, stream);
 
             AssertStreamIsEqualTo(stream, "10-00-00-00-00-00-00-00-0F-01-01-06-02-00-00-00-01-05-46-6F-72-63-65");
 
             stream.Seek(0, SeekOrigin.Begin);
-            ObjWithEnum? result = BossSerializer.Deserialize<ObjWithEnum>(stream);
+            ObjWithEnum? result = BossConvert.FromStream<ObjWithEnum>(stream);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<ObjWithEnum>());
             Assert.That(result.Force, Is.EqualTo(obj.Force));
@@ -197,12 +197,12 @@ namespace CodeImp.Boss.Tests
             ObjWithNamedEnum obj = new ObjWithNamedEnum();
             obj.Force = ForcesByName.Electromagnetism;
             MemoryStream stream = new MemoryStream();
-            BossSerializer.Serialize(obj, stream);
+            BossConvert.ToStream(obj, stream);
 
             AssertStreamIsEqualTo(stream, "0D-00-00-00-00-00-00-00-0F-01-01-0C-02-02-05-46-6F-72-63-65-10-45-6C-65-63-74-72-6F-6D-61-67-6E-65-74-69-73-6D");
 
             stream.Seek(0, SeekOrigin.Begin);
-            ObjWithNamedEnum? result = BossSerializer.Deserialize<ObjWithNamedEnum>(stream);
+            ObjWithNamedEnum? result = BossConvert.FromStream<ObjWithNamedEnum>(stream);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<ObjWithNamedEnum>());
             Assert.That(result.Force, Is.EqualTo(obj.Force));

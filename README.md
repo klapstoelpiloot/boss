@@ -2,15 +2,19 @@
 
 This is a software library and file format to serialize C# objects to a binary file or data stream. It is designed for fast and compact storage while keeping the flexibility of allowing changes in the model being serialized/deserialized. To allow this flexibility, the data must be serialized along with the names and types of the model members and deserialized with a little resilience towards missing members and type changes.
 
+Since [Microsoft has banned the BinaryFormatter for security risks](https://learn.microsoft.com/en-us/dotnet/standard/serialization/binaryformatter-security-guide), the Boss serialization is a good alternative to Json when you need to get your data smaller and still want the flexibility that Json provides.
+
 ## Usage
-To serialize an object to a binary data stream, call the static `Serialize` method like this:
+To serialize an object to a binary data stream, call one of the static methods in the `BossConvert` class like this:
 ```C#
-BossSerializer.Serialize(obj, stream);
+BossConvert.ToStream(obj, stream);
 ```
-To deserialize a binary data stream back to an object, call the static `Deserialize` method:
+To deserialize a binary data stream back to an object, call the deserialization equivalent method:
 ```C#
-MyClass? result = BossSerializer.Deserialize<MyClass>(stream);
+MyClass? result = BossConvert.FromStream<MyClass>(stream);
 ```
+There are also convenient methods that allow serialization to byte arrays and Base64 strings as well. Each method also has an optional `compress` parameter that you can set to `true` to squeeze the data a little smaller.
+
 You can use the `BossIgnore` attribute on field and property members to indicate that they should not be serialized or deserialized:
 ```C#
 public class ObjWithIgnoredProperty
@@ -37,6 +41,19 @@ public class ObjWithPolymorhpicMember
     public BaseClass ClassObj { get; set; } = new DerivedClass();
 }
 ```
+To control how Enumerations are serialized, you can use the `BossEnumOptions` attribute. This allows you to choose the method of serialization (by value or by enum member name). Obviously, serializing the members by name will generate a larger amount of data. But it provides the flexibility of changing your member values without breaking compatibility with your serialized data.
+```C#
+[BossEnumOptions(Method = EnumSerializationMethod.MemberNames)]
+public enum Forces
+{
+    None = 0,
+    Gravity = 1,
+    Electromagnetism = 2,
+    Weak = 3,
+    Strong = 4
+};
+```
+
 
 ## Type handlers
 A type handler controls how a specific datatype is serialized and deserialized. For most of the basic types there is already a type handler implemented internally. However, you can (and should) write your own type handler for classes/structs that are unlikely to change structure. This can significantly reduce the size of the data written and improve performance.
