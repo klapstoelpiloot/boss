@@ -66,6 +66,18 @@ namespace CodeImp.Boss.Tests
         }
 
         [Test]
+        public void IncompatibleFieldsWithException()
+        {
+            ObjWithAllFields obj = new ObjWithAllFields();
+            MemoryStream stream = new MemoryStream();
+            BossSerializer.Serialize(obj, stream);
+
+            stream.Seek(0, SeekOrigin.Begin);
+            
+            Assert.Catch<BossSerializationException>(() => BossSerializer.Deserialize<ObjWithIncompatibleFields>(stream));
+        }
+
+        [Test]
         public void IncompatibleFields()
         {
             ObjWithAllFields obj = new ObjWithAllFields();
@@ -73,7 +85,10 @@ namespace CodeImp.Boss.Tests
             BossSerializer.Serialize(obj, stream);
 
             stream.Seek(0, SeekOrigin.Begin);
-            ObjWithIncompatibleFields? result = BossSerializer.Deserialize<ObjWithIncompatibleFields>(stream);
+            
+            BossSerializer serializer = new BossSerializer();
+            serializer.ThrowOnDeserializationFailure = false;
+            ObjWithIncompatibleFields? result = serializer.DeserializeI<ObjWithIncompatibleFields>(stream);
             Assert.That(result, Is.Not.Null);
             Assert.That(result, Is.InstanceOf<ObjWithIncompatibleFields>());
             Assert.That(result.name, Is.EqualTo(0));

@@ -23,6 +23,8 @@ namespace CodeImp.Boss.Tests
 			TestPrimitiveArrayType<ulong>([3, 2, 1], "26-00-00-00-00-00-00-00-0F-01-01-0D-03-09-03-00-00-00-00-00-00-00-02-00-00-00-00-00-00-00-01-00-00-00-00-00-00-00-01-07-4E-75-6D-62-65-72-73");
 			TestPrimitiveArrayType<float>([3.0f, 2.0f, 1.0f], "1A-00-00-00-00-00-00-00-0F-01-01-0D-03-0A-00-00-40-40-00-00-00-40-00-00-80-3F-01-07-4E-75-6D-62-65-72-73");
 			TestPrimitiveArrayType<double>([3.0000000003, 2.0000000002, 1.0000000001], "26-00-00-00-00-00-00-00-0F-01-01-0D-03-0B-D4-4E-0A-00-00-00-08-40-38-DF-06-00-00-00-00-40-38-DF-06-00-00-00-F0-3F-01-07-4E-75-6D-62-65-72-73");
+            TestPrimitiveArrayType<Forces>([Forces.Electromagnetism, Forces.Weak, Forces.Gravity], "1A-00-00-00-00-00-00-00-0F-01-01-0D-03-06-02-00-00-00-03-00-00-00-01-00-00-00-01-07-4E-75-6D-62-65-72-73");
+            TestPrimitiveArrayType<ForcesByName>([ForcesByName.Electromagnetism, ForcesByName.Weak, ForcesByName.Gravity], "11-00-00-00-00-00-00-00-0F-01-01-0D-03-0C-02-03-04-04-07-4E-75-6D-62-65-72-73-10-45-6C-65-63-74-72-6F-6D-61-67-6E-65-74-69-73-6D-04-57-65-61-6B-07-47-72-61-76-69-74-79");
 		}
 
 		private void TestPrimitiveArrayType<T>(T[] values, string expecteddata)
@@ -61,6 +63,31 @@ namespace CodeImp.Boss.Tests
 			Assert.That(result, Is.Not.Null);
 			Assert.That(result, Is.InstanceOf<ObjWithList>());
 			Assert.That(result.Numbers, Is.EqualTo(obj.Numbers));
+		}
+
+		public class ObjWithEnums
+		{
+			public List<Forces> Enums { get; set; } = [];
+            public List<ForcesByName> EnumNames { get; set; } = [];
+		}
+
+		[Test]
+		public void EnumsList()
+		{
+			ObjWithEnums obj = new ObjWithEnums();
+            obj.Enums = [Forces.Electromagnetism, Forces.Weak, Forces.Gravity];
+            obj.EnumNames = [ForcesByName.Electromagnetism, ForcesByName.Weak, ForcesByName.Gravity];
+			MemoryStream stream = new MemoryStream();
+			BossSerializer.Serialize(obj, stream);
+
+			AssertStreamIsEqualTo(stream, "21-00-00-00-00-00-00-00-0F-02-01-0D-03-06-02-00-00-00-03-00-00-00-01-00-00-00-02-0D-03-0C-03-04-05-05-05-45-6E-75-6D-73-09-45-6E-75-6D-4E-61-6D-65-73-10-45-6C-65-63-74-72-6F-6D-61-67-6E-65-74-69-73-6D-04-57-65-61-6B-07-47-72-61-76-69-74-79");
+
+			stream.Position = 0;
+			ObjWithEnums? result = BossSerializer.Deserialize<ObjWithEnums>(stream);
+			Assert.That(result, Is.Not.Null);
+			Assert.That(result, Is.InstanceOf<ObjWithEnums>());
+			Assert.That(result.Enums, Is.EqualTo(obj.Enums));
+			Assert.That(result.EnumNames, Is.EqualTo(obj.EnumNames));
 		}
 
 		public class ObjWithQueue

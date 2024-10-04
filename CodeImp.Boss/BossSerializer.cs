@@ -38,7 +38,7 @@ namespace CodeImp.Boss
         }
 
         // Instance constructor
-        private BossSerializer()
+        public BossSerializer()
         {
         }
 
@@ -116,6 +116,25 @@ namespace CodeImp.Boss
             using MemoryStream stream = new MemoryStream();
             SerializeCompressed(obj, stream);
             return stream.ToArray();
+        }
+
+        /// <summary>
+        /// Deserializes an object from the specified stream.
+		/// This does not close or dispose the stream.
+		/// </summary>
+		public T? DeserializeI<T>(Stream stream)
+        {
+            handlerslock.AcquireReaderLock(TimeSpan.FromSeconds(1));
+            try
+            {
+                using BossReader reader = new BossReader(stream);
+                reader.BeginReading();
+                return (T?)Deserialize(reader, typeof(T));
+            }
+            finally
+            {
+                handlerslock.ReleaseReaderLock();
+            }
         }
 
         /// <summary>

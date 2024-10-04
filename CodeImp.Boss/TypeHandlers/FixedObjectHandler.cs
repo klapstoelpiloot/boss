@@ -120,11 +120,7 @@ namespace CodeImp.Boss.TypeHandlers
                         }
                         else
                         {
-                            if(fieldinfo.FieldType.IsEnum && (result is string resultstr))
-                                fieldinfo.SetValue(obj, Enum.Parse(fieldinfo.FieldType, resultstr));
-                            else if(fieldinfo.FieldType.IsEnum)
-                                fieldinfo.SetValue(obj, Enum.ToObject(fieldinfo.FieldType, result));
-                            else if(IsConversionNeeded(result.GetType(), fieldinfo.FieldType))
+                            if(IsConversionNeeded(result.GetType(), fieldinfo.FieldType))
                                 fieldinfo.SetValue(obj, Convert.ChangeType(result, fieldinfo.FieldType));
                             else
 					            fieldinfo.SetValue(obj, result);
@@ -148,11 +144,7 @@ namespace CodeImp.Boss.TypeHandlers
                         }
                         else
                         {
-                            if(propinfo.PropertyType.IsEnum && (result is string resultstr))
-                                propinfo.SetValue(obj, Enum.Parse(propinfo.PropertyType, resultstr));
-                            else if(propinfo.PropertyType.IsEnum)
-                                propinfo.SetValue(obj, Enum.ToObject(propinfo.PropertyType, result));
-                            else if(IsConversionNeeded(result.GetType(), propinfo.PropertyType))
+                            if(IsConversionNeeded(result.GetType(), propinfo.PropertyType))
                                 propinfo.SetValue(obj, Convert.ChangeType(result, propinfo.PropertyType));
                             else
                                 propinfo.SetValue(obj, result);

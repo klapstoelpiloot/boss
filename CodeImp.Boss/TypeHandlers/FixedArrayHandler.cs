@@ -19,41 +19,42 @@ namespace CodeImp.Boss.TypeHandlers
 			writer.WriteVLQ(elementcount);
 			writer.Write(handler.BossType);
 
-			switch(value)
-			{
-				// Special optimized code for primitives to avoid boxing
-				case bool[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
-				case byte[] array: writer.Write(array); return;
-				case sbyte[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
-				case short[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
-				case ushort[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
-				case int[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
-				case uint[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
-				case long[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
-				case ulong[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
-				case float[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
-				case double[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
-				case List<bool> list: list.ForEach(v => writer.Write(v)); return;
-				case List<byte> list: list.ForEach(v => writer.Write(v)); return;
-				case List<sbyte> list: list.ForEach(v => writer.Write(v)); return;
-				case List<short> list: list.ForEach(v => writer.Write(v)); return;
-				case List<ushort> list: list.ForEach(v => writer.Write(v)); return;
-				case List<int> list: list.ForEach(v => writer.Write(v)); return;
-				case List<uint> list: list.ForEach(v => writer.Write(v)); return;
-				case List<long> list: list.ForEach(v => writer.Write(v)); return;
-				case List<ulong> list: list.ForEach(v => writer.Write(v)); return;
-				case List<float> list: list.ForEach(v => writer.Write(v)); return;
-				case List<double> list: list.ForEach(v => writer.Write(v)); return;
+            if(elementtype.IsPrimitive && !elementtype.IsEnum)
+            {
+			    switch(value)
+			    {
+				    // Special optimized code for primitives to avoid boxing
+				    case bool[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
+				    case byte[] array: writer.Write(array); return;
+				    case sbyte[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
+				    case short[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
+				    case ushort[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
+				    case int[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
+				    case uint[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
+				    case long[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
+				    case ulong[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
+				    case float[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
+				    case double[] array: for(int i = 0; i < array.Length; i++) { writer.Write(array[i]); } return;
+				    case List<bool> list: list.ForEach(v => writer.Write(v)); return;
+				    case List<byte> list: list.ForEach(v => writer.Write(v)); return;
+				    case List<sbyte> list: list.ForEach(v => writer.Write(v)); return;
+				    case List<short> list: list.ForEach(v => writer.Write(v)); return;
+				    case List<ushort> list: list.ForEach(v => writer.Write(v)); return;
+				    case List<int> list: list.ForEach(v => writer.Write(v)); return;
+				    case List<uint> list: list.ForEach(v => writer.Write(v)); return;
+				    case List<long> list: list.ForEach(v => writer.Write(v)); return;
+				    case List<ulong> list: list.ForEach(v => writer.Write(v)); return;
+				    case List<float> list: list.ForEach(v => writer.Write(v)); return;
+				    case List<double> list: list.ForEach(v => writer.Write(v)); return;
+                }
+            }
 
-				// Use an oldschool enumerator and the type handler.
-				// This causes boxing to an object and is slightly slower.
-				default:
-					IEnumerable enumerable = value as IEnumerable;
-					foreach(object e in enumerable)
-					{
-						handler.WriteTo(serializer, writer, e);
-					}
-					return;
+			// Use an oldschool enumerator and the type handler.
+			// This causes boxing to an object and is slightly slower.
+			IEnumerable enumerable = value as IEnumerable;
+			foreach(object e in enumerable)
+			{
+				handler.WriteTo(serializer, writer, e);
 			}
 		}
 
@@ -66,36 +67,36 @@ namespace CodeImp.Boss.TypeHandlers
 
 			if(basetype.IsArray)
 			{
-				switch(Type.GetTypeCode(elementtype))
-				{
-					// Special optimized code for primitives to avoid boxing
-					case TypeCode.Boolean: { bool[] array = new bool[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadBoolean(); } return array; }
-					case TypeCode.Byte: { byte[] array = reader.ReadBytes(elementcount); return array; }
-					case TypeCode.SByte: { sbyte[] array = new sbyte[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadSByte(); } return array; }
-					case TypeCode.Int16: { short[] array = new short[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadInt16(); } return array; }
-					case TypeCode.UInt16: { ushort[] array = new ushort[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadUInt16(); } return array; }
-					case TypeCode.Int32: { int[] array = new int[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadInt32(); } return array; }
-					case TypeCode.UInt32: { uint[] array = new uint[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadUInt32(); } return array; }
-					case TypeCode.Int64: { long[] array = new long[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadInt64(); } return array; }
-					case TypeCode.UInt64: { ulong[] array = new ulong[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadUInt64(); } return array; }
-					case TypeCode.Single: { float[] array = new float[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadSingle(); } return array; }
-					case TypeCode.Double: { double[] array = new double[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadDouble(); } return array; }
+                if(elementtype.IsPrimitive && !elementtype.IsEnum)
+                {
+				    switch(Type.GetTypeCode(elementtype))
+				    {
+					    // Special optimized code for primitives to avoid boxing
+					    case TypeCode.Boolean: { bool[] array = new bool[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadBoolean(); } return array; }
+					    case TypeCode.Byte: { byte[] array = reader.ReadBytes(elementcount); return array; }
+					    case TypeCode.SByte: { sbyte[] array = new sbyte[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadSByte(); } return array; }
+					    case TypeCode.Int16: { short[] array = new short[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadInt16(); } return array; }
+					    case TypeCode.UInt16: { ushort[] array = new ushort[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadUInt16(); } return array; }
+					    case TypeCode.Int32: { int[] array = new int[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadInt32(); } return array; }
+					    case TypeCode.UInt32: { uint[] array = new uint[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadUInt32(); } return array; }
+					    case TypeCode.Int64: { long[] array = new long[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadInt64(); } return array; }
+					    case TypeCode.UInt64: { ulong[] array = new ulong[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadUInt64(); } return array; }
+					    case TypeCode.Single: { float[] array = new float[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadSingle(); } return array; }
+					    case TypeCode.Double: { double[] array = new double[elementcount]; for(int i = 0; i < array.Length; i++) { array[i] = reader.ReadDouble(); } return array; }
+				    }
+                }
 
-					// The slower method which works for all types...
-					default:
-					{
-						object[] array = new object[elementcount];
-						for(int i = 0; i < elementcount; i++)
-							array[i] = handler.ReadFrom(serializer, reader, elementtype);
-						Array result = Array.CreateInstance(elementtype, elementcount);
-						Array.Copy(array, result, elementcount);
-						return result;
-					}
-				}
+                // Standard reading using the type handler
+				object[] oarray = new object[elementcount];
+				for(int i = 0; i < elementcount; i++)
+					oarray[i] = handler.ReadFrom(serializer, reader, elementtype);
+				Array result = Array.CreateInstance(elementtype, elementcount);
+				Array.Copy(oarray, result, elementcount);
+				return result;
 			}
 			else
 			{
-				if(basetype.GetGenericTypeDefinition() == typeof(List<>))
+				if((basetype.GetGenericTypeDefinition() == typeof(List<>)) && elementtype.IsPrimitive && !elementtype.IsEnum)
 				{
 					// Special optimized code for primitives to avoid boxing
 					switch(Type.GetTypeCode(elementtype))

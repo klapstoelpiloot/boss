@@ -14,7 +14,11 @@ namespace CodeImp.Boss.TypeHandlers
 
 		public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
 		{
-			return reader.ReadByte();
+			byte v = reader.ReadByte();
+            if(basetype.IsEnum)
+                return Enum.ToObject(basetype, v);
+            else
+                return v;
 		}
 	}
 }

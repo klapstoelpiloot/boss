@@ -16,6 +16,8 @@ namespace CodeImp.Boss.Tests
             TestPrimtiveType<ulong>(42, "11-00-00-00-00-00-00-00-09-2A-00-00-00-00-00-00-00-00");
             TestPrimtiveType<float>(42.42f, "0D-00-00-00-00-00-00-00-0A-14-AE-29-42-00");
             TestPrimtiveType<double>(42.42424242424242, "11-00-00-00-00-00-00-00-0B-36-D9-64-93-4D-36-45-40-00");
+            TestPrimtiveType<Forces>(Forces.Electromagnetism, "0D-00-00-00-00-00-00-00-06-02-00-00-00-00");
+            TestPrimtiveType<ForcesByName>(ForcesByName.Electromagnetism, "0A-00-00-00-00-00-00-00-0C-01-01-10-45-6C-65-63-74-72-6F-6D-61-67-6E-65-74-69-73-6D");
         }
 
         private void TestPrimtiveType<T>(T value, string expecteddata)
@@ -161,25 +163,6 @@ namespace CodeImp.Boss.Tests
             Assert.That(result.firstname, Is.EqualTo(obj.firstname));
             Assert.That(result.samevalue, Is.EqualTo(obj.samevalue));
         }
-
-        public enum Forces
-        {
-            None = 0,
-            Gravity = 1,
-            Electromagnetism = 2,
-            Weak = 3,
-            Strong = 4
-        };
-
-        [BossEnumOptions(Method = EnumSerializationMethod.Names)]
-        public enum ForcesByName
-        {
-            None = 0,
-            Gravity = 1,
-            Electromagnetism = 2,
-            Weak = 3,
-            Strong = 4
-        };
 
         public class ObjWithEnum
         {
