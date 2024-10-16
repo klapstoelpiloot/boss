@@ -1,7 +1,9 @@
 ﻿using CodeImp.Boss.Tests.Performance;
 using System.Reflection;
 
-string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+string? path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+if(path == null)
+	throw new IOException();
 
 PerformanceTest test = new PerformanceTest();
 const int REPEATS = 20;

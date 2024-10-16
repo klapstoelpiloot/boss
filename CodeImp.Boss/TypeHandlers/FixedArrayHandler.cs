@@ -8,7 +8,7 @@ namespace CodeImp.Boss.TypeHandlers
 	public class FixedArrayHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.FixedArray;
-		public override Type? ClassType => null;
+		public override Type ClassType => null;
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{
@@ -58,7 +58,7 @@ namespace CodeImp.Boss.TypeHandlers
 			}
 		}
 
-		public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
+		public override object ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
 		{
 			int elementcount = reader.ReadVLQ();
 			byte elementtypecode = reader.ReadByte();
@@ -122,11 +122,11 @@ namespace CodeImp.Boss.TypeHandlers
 
 				// Create the collection through reflection
 				object collection = Activator.CreateInstance(basetype);
-				PropertyInfo? capproperty = basetype.GetProperty("Capacity");
+				PropertyInfo capproperty = basetype.GetProperty("Capacity");
 				capproperty?.SetValue(collection, elementcount);
 
 				// Add items
-				MethodInfo? addmethod = basetype.GetMethod("Add");
+				MethodInfo addmethod = basetype.GetMethod("Add");
 				if(addmethod != null)
 				{
 					for(int i = 0; i < array.Length; i++)
@@ -135,7 +135,7 @@ namespace CodeImp.Boss.TypeHandlers
 				}
 
 				// Enqueue items
-				MethodInfo? enqueuemethod = basetype.GetMethod("Enqueue");
+				MethodInfo enqueuemethod = basetype.GetMethod("Enqueue");
 				if(enqueuemethod != null)
 				{
 					for(int i = 0; i < array.Length; i++)
@@ -144,7 +144,7 @@ namespace CodeImp.Boss.TypeHandlers
 				}
 
 				// Push items
-				MethodInfo? pushmethod = basetype.GetMethod("Push");
+				MethodInfo pushmethod = basetype.GetMethod("Push");
 				if(pushmethod != null)
 				{
 					for(int i = 0; i < array.Length; i++)

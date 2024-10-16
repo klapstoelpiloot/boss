@@ -7,7 +7,7 @@ namespace CodeImp.Boss.TypeHandlers
 	public class DynamicArrayHandler : BossTypeHandler
 	{
 		public override byte BossType => (byte)BossTypeCode.DynamicArray;
-		public override Type? ClassType => null;
+		public override Type ClassType => null;
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{
@@ -17,18 +17,18 @@ namespace CodeImp.Boss.TypeHandlers
 			writer.WriteVLQ(elementcount);
 
 			IEnumerable enumerable = value as IEnumerable;
-			foreach(object? e in enumerable)
+			foreach(object e in enumerable)
 			{
 				serializer.SerializeInternal(e, elementtype, writer, false);
 			}
 		}
 
-		public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
+		public override object ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
 		{
 			int elementcount = reader.ReadVLQ();
 			Type elementtype = BossSerializer.GetCollectionElementType(basetype);
 
-			object?[] list = new object?[elementcount];
+			object[] list = new object[elementcount];
 			for(int i = 0; i < elementcount; i++)
 			{
 				list[i] = serializer.DeserializeInternal(reader, elementtype);
@@ -43,9 +43,9 @@ namespace CodeImp.Boss.TypeHandlers
 			else
 			{
 				object collection = Activator.CreateInstance(basetype);
-				PropertyInfo? capproperty = basetype.GetProperty("Capacity");
+				PropertyInfo capproperty = basetype.GetProperty("Capacity");
 				capproperty?.SetValue(collection, elementcount);
-				MethodInfo? addmethod = basetype.GetMethod("Add");
+				MethodInfo addmethod = basetype.GetMethod("Add");
 				if(addmethod != null)
 				{
 					for(int i = 0; i < elementcount; i++)
@@ -53,7 +53,7 @@ namespace CodeImp.Boss.TypeHandlers
 					return collection;
 				}
 
-				MethodInfo? enqueuemethod = basetype.GetMethod("Enqueue");
+				MethodInfo enqueuemethod = basetype.GetMethod("Enqueue");
 				if(enqueuemethod != null)
 				{
 					for(int i = 0; i < elementcount; i++)
@@ -61,7 +61,7 @@ namespace CodeImp.Boss.TypeHandlers
 					return collection;
 				}
 
-				MethodInfo? pushmethod = basetype.GetMethod("Push");
+				MethodInfo pushmethod = basetype.GetMethod("Push");
 				if(pushmethod != null)
 				{
 					for(int i = 0; i < elementcount; i++)

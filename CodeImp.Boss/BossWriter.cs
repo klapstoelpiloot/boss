@@ -42,7 +42,7 @@ namespace CodeImp.Boss
 		}
 
 		// We do strings differently
-		new public void Write(string? value)
+		new public void Write(string value)
 		{
 			int index = StoreString(value);
 			WriteVLQ(index);
@@ -58,7 +58,7 @@ namespace CodeImp.Boss
 		}
 
 		// Puts a string in the strings table and returns its index
-		private int StoreString(string? s)
+		private int StoreString(string s)
 		{
 			if(s == null)
 				return 0;

@@ -97,14 +97,14 @@ namespace CodeImp.Boss
         /// Deserializes an object from the specified stream.
 		/// This does not close or dispose the stream.
 		/// </summary>
-		public T? Deserialize<T>(Stream stream)
+		public T Deserialize<T>(Stream stream)
         {
             handlerslock.AcquireReaderLock(TimeSpan.FromSeconds(1));
             try
             {
                 using BossReader reader = new BossReader(stream);
                 reader.BeginReading();
-                return (T?)DeserializeInternal(reader, typeof(T));
+                return (T)DeserializeInternal(reader, typeof(T));
             }
             finally
             {
@@ -132,7 +132,7 @@ namespace CodeImp.Boss
         /// The argument objecttype is the actual object's type, which may be different.
         /// Set it to null when the object is null.
         /// </summary>
-        public BossTypeHandler SelectTypeHandler(Type membertype, Type? objecttype, bool forcedynamic)
+        public BossTypeHandler SelectTypeHandler(Type membertype, Type objecttype, bool forcedynamic)
         {
             // Null is just that. Null.
             if (objecttype is null)
@@ -196,14 +196,14 @@ namespace CodeImp.Boss
         }
 
         // Serializes the given object
-        internal void SerializeInternal(object? obj, Type type, BossWriter writer, bool forcedynamic)
+        internal void SerializeInternal(object obj, Type type, BossWriter writer, bool forcedynamic)
         {
-            BossTypeHandler? handler = SelectTypeHandler(type, obj?.GetType() ?? null, forcedynamic);
+            BossTypeHandler handler = SelectTypeHandler(type, obj?.GetType() ?? null, forcedynamic);
             SerializeWithHandler(obj, handler, writer);
         }
 
         // Deserializes an object
-        internal object? DeserializeInternal(BossReader reader, Type basetype)
+        internal object DeserializeInternal(BossReader reader, Type basetype)
         {
             byte typecode = reader.ReadByte();
             BossTypeHandler handler = typehandlers[typecode];
@@ -211,7 +211,7 @@ namespace CodeImp.Boss
         }
 
         // Serializes the given object using the specified type handler.
-        internal void SerializeWithHandler(object? obj, BossTypeHandler handler, BossWriter writer)
+        internal void SerializeWithHandler(object obj, BossTypeHandler handler, BossWriter writer)
         {
             writer.Write(handler.BossType);
             if (obj != null)
@@ -221,10 +221,10 @@ namespace CodeImp.Boss
         }
 
         // This tries to find a type by its name and basetype.
-        internal Type? FindType(string typename, Type basetype)
+        internal Type FindType(string typename, Type basetype)
         {
             // Can we get a quick result from cache?
-            if (typenamelookup.TryGetValue(typename, out Type? type) && basetype.IsAssignableFrom(type))
+            if (typenamelookup.TryGetValue(typename, out Type type) && basetype.IsAssignableFrom(type))
                 return type;
 
             // Chances are high that the specified type resides in the same assembly as the base type

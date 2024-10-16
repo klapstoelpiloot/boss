@@ -7,7 +7,7 @@ namespace CodeImp.Boss
 {
 	public class BossReader : BinaryReader
 	{
-		private readonly List<string?> stringstable = new List<string?>();
+		private readonly List<string> stringstable = new List<string>();
 
 		public BossReader(Stream input) : base(input, Encoding.UTF8, true)
 		{
@@ -32,7 +32,7 @@ namespace CodeImp.Boss
 		}
 
 		// We do strings differently
-		new public string? ReadString()
+		new public string ReadString()
 		{
 			int index = ReadVLQ();
 			return stringstable[index];

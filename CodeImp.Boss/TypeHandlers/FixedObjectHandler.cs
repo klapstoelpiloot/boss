@@ -13,12 +13,12 @@ namespace CodeImp.Boss.TypeHandlers
 		{
 			public string Name;
 			public Type Type;
-			public object? Value;
+			public object Value;
 			public bool ForceDynamic;
 		};
 
 		public override byte BossType => (byte)BossTypeCode.FixedObject;
-		public override Type? ClassType => null;
+		public override Type ClassType => null;
 
 		public override void WriteTo(BossSerializer serializer, BossWriter writer, object value)
 		{
@@ -93,16 +93,16 @@ namespace CodeImp.Boss.TypeHandlers
 			}
 		}
 
-		public override object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
+		public override object ReadFrom(BossSerializer serializer, BossReader reader, Type basetype)
 		{
-			object? obj = CreateInstance(serializer, reader, basetype);
+			object obj = CreateInstance(serializer, reader, basetype);
 			Type objtype = obj?.GetType() ?? basetype;
             List<MemberInfo> objmembers = serializer.GetSerializableMembers(objtype);
 			int memberscount = reader.ReadVLQ();
 			for(int i = 0; i < memberscount; i++)
 			{
 				string membername = reader.ReadString() ?? throw new InvalidDataException("Member names cannot be null strings.");
-				MemberInfo? memberinfo = objmembers.FirstOrDefault(m => m.Name == membername);;
+				MemberInfo memberinfo = objmembers.FirstOrDefault(m => m.Name == membername);;
 				if(memberinfo == null)
 				{
 					// To continue deserializing, we MUST call deserialize to skip this data.
@@ -111,7 +111,7 @@ namespace CodeImp.Boss.TypeHandlers
 				else if(memberinfo is FieldInfo fieldinfo)
 				{
                     // Member is a field
-					object? result = serializer.DeserializeInternal(reader, fieldinfo.FieldType);
+					object result = serializer.DeserializeInternal(reader, fieldinfo.FieldType);
                     try
                     {
                         if(result == null)
@@ -135,7 +135,7 @@ namespace CodeImp.Boss.TypeHandlers
 				else if(memberinfo is PropertyInfo propinfo)
 				{
                     // Member is a property
-					object? result = serializer.DeserializeInternal(reader, propinfo.PropertyType);
+					object result = serializer.DeserializeInternal(reader, propinfo.PropertyType);
                     try
                     {
                         if(result == null)
@@ -164,7 +164,7 @@ namespace CodeImp.Boss.TypeHandlers
 			return obj;
 		}
 
-		protected virtual object? CreateInstance(BossSerializer serializer, BossReader reader, Type basetype)
+		protected virtual object CreateInstance(BossSerializer serializer, BossReader reader, Type basetype)
 		{
 			return Activator.CreateInstance(basetype, false);
 		}

@@ -19,7 +19,7 @@ namespace CodeImp.Boss
         /// <summary>
         /// .NET class type that this handler will deal with.
         /// </summary>
-        public abstract Type? ClassType { get; }
+        public abstract Type ClassType { get; }
 
         /// <summary>
         /// Called to serialized an object to stream.
@@ -31,6 +31,6 @@ namespace CodeImp.Boss
         /// Called to deserialize an object from stream.
         /// The data read must match exactly with the written data in the WriteTo method.
         /// </summary>
-        public abstract object? ReadFrom(BossSerializer serializer, BossReader reader, Type basetype);
+        public abstract object ReadFrom(BossSerializer serializer, BossReader reader, Type basetype);
     }
 }

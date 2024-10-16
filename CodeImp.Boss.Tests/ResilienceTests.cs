@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿#pragma warning disable 0649
+
+using System.Drawing;
 
 namespace CodeImp.Boss.Tests
 {

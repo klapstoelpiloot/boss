@@ -53,7 +53,7 @@ namespace CodeImp.Boss
         /// Deserializes an object from the specified stream.
 		/// This does not close or dispose the stream.
 		/// </summary>
-		public static T? FromStream<T>(Stream stream, bool decompress = false)
+		public static T FromStream<T>(Stream stream, bool decompress = false)
         {
             BossSerializer s = new BossSerializer();
             if (decompress)
@@ -73,7 +73,7 @@ namespace CodeImp.Boss
         /// <summary>
         /// Deserializes an object from the specified byte array.
         /// </summary>
-        public static T? FromBytes<T>(byte[] data, bool decompress = false)
+        public static T FromBytes<T>(byte[] data, bool decompress = false)
         {
             using MemoryStream stream = new MemoryStream(data);
             return FromStream<T>(stream, decompress);
@@ -82,7 +82,7 @@ namespace CodeImp.Boss
         /// <summary>
         /// Deserializes an object from the specified Base64 string.
         /// </summary>
-        public static T? FromBase64<T>(string str, bool decompress = false)
+        public static T FromBase64<T>(string str, bool decompress = false)
         {
             byte[] data = Convert.FromBase64String(str);
             return FromBytes<T>(data, decompress);
