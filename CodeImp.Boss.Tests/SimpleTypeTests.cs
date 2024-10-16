@@ -18,6 +18,8 @@ namespace CodeImp.Boss.Tests
             TestPrimtiveType<double>(42.42424242424242, "11-00-00-00-00-00-00-00-0B-36-D9-64-93-4D-36-45-40-00");
             TestPrimtiveType<Forces>(Forces.Electromagnetism, "0D-00-00-00-00-00-00-00-06-02-00-00-00-00");
             TestPrimtiveType<ForcesByName>(ForcesByName.Electromagnetism, "0A-00-00-00-00-00-00-00-0C-01-01-10-45-6C-65-63-74-72-6F-6D-61-67-6E-65-74-69-73-6D");
+            TestPrimtiveType<DateTime>(new DateTime(2024, 10, 16, 14, 02, 42, DateTimeKind.Local), "12-00-00-00-00-00-00-00-13-00-6D-AF-33-EB-ED-DC-08-02-00");
+            TestPrimtiveType<TimeSpan>(new TimeSpan(7, 6, 5, 4, 3, 2), "11-00-00-00-00-00-00-00-14-44-DD-B1-28-B3-05-00-00-00");
         }
 
         private void TestPrimtiveType<T>(T value, string expecteddata)
