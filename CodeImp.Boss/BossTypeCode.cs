@@ -27,6 +27,8 @@
         DynamicObject = 16,
         FixedDictionary = 17,
         DynamicDictionary = 18,
+		DateTime = 19,
+		TimeSpan = 20
 
         LastBuiltIn = 63
     }
